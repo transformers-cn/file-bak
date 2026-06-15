@@ -10,3 +10,6 @@ https://github.com/orgs/SMFL-digi-assetforce/invitation?invitation_token=a1b64af
 Note: This invitation was intended for Jian.Cao@smfl.co.jp. If you were not expecting this invitation, you can ignore this email. If @sasai-k is sending you too many emails, you can block them or report them for abuse. 
 Button not working? Paste the following link into your browser:
 https://github.com/orgs/SMFL-digi-assetforce/invitation?invitation_token=e7a19b9a6dc5183cc10b472c73a657f5cbb77efe&via_email=1
+
+
+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
