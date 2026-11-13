@@ -1,0 +1,70 @@
+<div class="modal-mask" (click)="onMaskClick($event)">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">{{ isEdit ? '编辑药品' : '新增药品' }}</span>
+      <button class="modal-close" (click)="closed.emit()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-item">
+          <label class="required">药品名称</label>
+          <input class="form-control" type="text" [(ngModel)]="form.medicineName" maxlength="50" />
+        </div>
+        <div class="form-item">
+          <label>生产厂家</label>
+          <input class="form-control" type="text" [(ngModel)]="form.manufacturer" maxlength="50" />
+        </div>
+        <div class="form-item">
+          <label class="required">生产日期</label>
+          <input class="form-control" type="date" [(ngModel)]="form.productionDate" />
+        </div>
+        <div class="form-item">
+          <label class="required">保质期（月）</label>
+          <input class="form-control" type="number" min="1" [(ngModel)]="form.shelfLifeMonths" />
+        </div>
+        <div class="form-item">
+          <label>失效日期（自动计算）</label>
+          <input class="form-control" type="text" [ngModel]="expiryDate" readonly disabled />
+        </div>
+        <div class="form-item">
+          <label class="required">新增数量（盒）</label>
+          <input class="form-control" type="number" min="0" [(ngModel)]="form.addQuantity" />
+        </div>
+        <div class="form-item">
+          <label class="required">单盒药品数量（片）</label>
+          <input class="form-control" type="number" min="1" [(ngModel)]="form.tabletsPerBox" />
+        </div>
+        <div class="form-item">
+          <label class="required">吃药时间区分</label>
+          <select class="form-control" [(ngModel)]="form.intakeTimeCode">
+            <option value="">请选择</option>
+            <option *ngFor="let code of intakeTimeCodes" [value]="code.codeId">
+              {{ code.codeName }}
+            </option>
+          </select>
+        </div>
+        <div class="form-item">
+          <label class="required">每日吃药次数</label>
+          <input class="form-control" type="number" min="1" [(ngModel)]="form.dailyTimes" />
+        </div>
+        <div class="form-item">
+          <label class="required">每次吃药数量（片）</label>
+          <input class="form-control" type="number" min="1" [(ngModel)]="form.tabletsPerTime" />
+        </div>
+        <div class="form-item form-item-full">
+          <label>备注注意事项</label>
+          <textarea class="form-control" rows="2" maxlength="200" [(ngModel)]="form.remark"></textarea>
+        </div>
+      </div>
+      <div class="field-error" *ngIf="errorMsg">{{ errorMsg }}</div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="submit()" [disabled]="submitting">
+        {{ submitting ? '提交中...' : '确定' }}
+      </button>
+      <button class="btn" (click)="closed.emit()">取消</button>
+    </div>
+  </div>
+</div>

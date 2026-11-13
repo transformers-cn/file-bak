@@ -1,0 +1,89 @@
+<div class="page">
+  <!-- 顶部栏 -->
+  <header class="topbar">
+    <div class="topbar-title">药品管理系统</div>
+    <div class="topbar-user">
+      <span>{{ userName }} 先生/女士</span>
+      <button class="btn topbar-logout" (click)="logout()">退出登录</button>
+    </div>
+  </header>
+
+  <main class="content">
+    <!-- 检索区 -->
+    <div class="card search-bar">
+      <input class="form-control search-input" type="text" [(ngModel)]="searchKeyword"
+             placeholder="请输入药品名称" (keyup.enter)="search()" />
+      <button class="btn btn-primary" (click)="search()">检索</button>
+      <button class="btn" (click)="reset()">重置</button>
+      <span class="flex-spacer"></span>
+      <button class="btn btn-primary" (click)="openCreate()">＋ 新增药品</button>
+    </div>
+
+    <!-- 欢迎语 -->
+    <p class="welcome">{{ userName }} 先生/女士，以下是您的药品列表。</p>
+
+    <!-- 列表区 -->
+    <div class="card table-card">
+      <table class="medicine-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>药品名称</th>
+            <th>生产厂家</th>
+            <th>生产日期</th>
+            <th>保质期</th>
+            <th>失效日期</th>
+            <th>剩余数量（盒）</th>
+            <th>单盒药品数量（片）</th>
+            <th>吃药时间区分</th>
+            <th>每日吃药次数</th>
+            <th>每次吃药数量（片）</th>
+            <th>备注注意事项</th>
+            <th class="col-op">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of list; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ item.medicineName }}</td>
+            <td>{{ item.manufacturer }}</td>
+            <td>{{ item.productionDate }}</td>
+            <td>{{ item.shelfLifeMonths / 12 | number:'1.0-0' }}年</td>
+            <td [class.expiry-warning]="isExpiringSoon(item.expiryDate)">{{ item.expiryDate }}</td>
+            <td [class.quantity-warning]="item.remainingQuantity <= 1">{{ item.remainingQuantity }}</td>
+            <td>{{ item.tabletsPerBox }}</td>
+            <td>{{ intakeTimeName(item.intakeTimeCode) }}</td>
+            <td>{{ item.dailyTimes }}</td>
+            <td>{{ item.tabletsPerTime }}</td>
+            <td class="cell-remark">{{ item.remark }}</td>
+            <td class="col-op">
+              <button class="btn btn-link" (click)="openEdit(item)">编辑</button>
+              <button class="btn btn-link btn-link-danger" (click)="confirmDelete(item)">删除</button>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && list.length === 0">
+            <td colspan="13" class="empty-row">暂无数据</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="loading-row" *ngIf="loading">加载中...</div>
+    </div>
+
+    <!-- 低库存提示（剩余数量<=1盒） -->
+    <div class="alert-warning" *ngIf="lowStockList.length > 0">
+      <div class="alert-title">⚠ 以下药品剩余数量不足（≤1盒），请及时购买：</div>
+      <ul>
+        <li *ngFor="let name of lowStockList">{{ name }}</li>
+      </ul>
+    </div>
+  </main>
+
+  <!-- 新增/编辑 POP 弹窗 -->
+  <app-medicine-form-modal
+    *ngIf="modalVisible"
+    [medicine]="editingMedicine"
+    [intakeTimeCodes]="intakeTimeCodes"
+    (saved)="onSaved()"
+    (closed)="closeModal()">
+  </app-medicine-form-modal>
+</div>

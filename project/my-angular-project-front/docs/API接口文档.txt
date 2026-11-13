@@ -1,0 +1,161 @@
+================================================================================
+药品管理系统 - 后端 API 接口文档（前端已按此约定开发）
+版本：v1.0
+前端项目：my-angular-project-front（Angular 11）
+说明：
+  1. 以下 URL 中的 {baseUrl} 目前为虚拟地址，配置于前端
+     src/environments/environment.ts 的 apiBaseUrl 字段（当前值：http://localhost:8080/api），
+     后端开发完成后仅需修改该配置即可对接。
+  2. 所有接口返回统一包装结构 ApiResponse<T>：
+     {
+       "code": 0,          // 0=成功，非0=业务错误
+       "message": "success",
+       "data": { ... }     // 业务数据，见各接口定义
+     }
+  3. 请求/响应均为 application/json; charset=utf-8。
+  4. 前端 environment.useMock=true 时使用本地 Mock 数据，
+     联调时改为 false 即可切换到真实后端。
+================================================================================
+
+--------------------------------------------------------------------------------
+1. 登录
+--------------------------------------------------------------------------------
+URL    : POST {baseUrl}/auth/login
+描述   : 简单登录，校验用户名密码，成功后进入药品检索页面。
+
+请求体（LoginRequest）：
+{
+  "username": "admin",      // string, 必填, 登录用户名
+  "password": "123456"      // string, 必填, 登录密码
+}
+
+响应 data（LoginResult）：
+{
+  "userId": "U0001",        // string, 用户ID（药品表主键1）
+  "userName": "张",          // string, 用户姓名（列表页欢迎语"张 先生/女士"使用）
+  "token": "xxxx"           // string, 登录令牌（前端存 sessionStorage）
+}
+
+失败约定：用户名或密码错误时，code 返回非 0（如 401），message 为错误信息。
+
+--------------------------------------------------------------------------------
+2. 药品检索（列表查询）
+--------------------------------------------------------------------------------
+URL    : GET {baseUrl}/medicines?medicineName={keyword}
+描述   : 按药品名称模糊检索当前用户的药品列表；medicineName 为空时查询全部。
+
+Query 参数：
+  medicineName : string, 可选, 药品名称关键字（模糊匹配）
+
+响应 data（MedicineListResult）：
+{
+  "total": 2,               // number, 记录总数
+  "list": [                 // Medicine[]，字段含义见附录A
+    {
+      "userId": "U0001",
+      "medicineId": "M0001",
+      "medicineName": "阿司匹林",
+      "manufacturer": "XXX制药厂",
+      "productionDate": "2026-01-01",
+      "shelfLifeMonths": 24,
+      "expiryDate": "2028-01-01",
+      "remainingQuantity": 3,
+      "tabletsPerBox": 7,
+      "intakeTimeCode": "002",
+      "dailyTimes": 1,
+      "tabletsPerTime": 1,
+      "remark": ""
+    }
+  ]
+}
+
+注意：expiryDate（失效日期）由后端根据 生产日期+保质期 计算并持久化后返回，
+      前端仅做展示（前端也会做同样的计算用于 POP 实时预览，双端算法需一致：
+      生产日期加 shelfLifeMonths 个月，日期溢出时按自然月进位）。
+
+--------------------------------------------------------------------------------
+3. 新增药品
+--------------------------------------------------------------------------------
+URL    : POST {baseUrl}/medicines
+描述   : 新增（编辑）药品 POP 画面点击【确定】后调用。
+
+请求体（MedicineSaveRequest + userId）：
+{
+  "userId": "U0001",            // string, 必填, 当前登录用户
+  "medicineName": "阿司匹林",     // string, 必填, 药品名称
+  "manufacturer": "XXX制药厂",   // string, 可选, 生产厂家
+  "productionDate": "2026-01-01",// string, 必填, 生产日期 yyyy-MM-dd
+  "shelfLifeMonths": 24,        // number, 必填, 保质期（月），画面按"年"输入也可，前端统一传月
+  "addQuantity": 3,             // number, 必填, 新增数量（盒），>=0
+  "tabletsPerBox": 7,           // number, 必填, 单盒药品数量（片），>=1
+  "intakeTimeCode": "002",      // string, 必填, 吃药时间区分（见接口5码表）
+  "dailyTimes": 1,              // number, 必填, 每日吃药次数，>=1
+  "tabletsPerTime": 1,          // number, 必填, 每次吃药数量（片），>=1
+  "remark": ""                  // string, 可选, 备注注意事项（<=200字）
+}
+
+响应 data（Medicine）：新增成功后的完整药品记录（含后端生成的 medicineId、
+计算出的 expiryDate、remainingQuantity = addQuantity），字段见附录A。
+
+--------------------------------------------------------------------------------
+4. 编辑药品
+--------------------------------------------------------------------------------
+URL    : PUT {baseUrl}/medicines/{medicineId}
+描述   : 编辑 POP 画面点击【确定】后调用。
+        约定：请求体中的 addQuantity 为"新增数量"，后端将其【累加】到现有
+        remaining_quantity 上（与新增 POP 的语义保持一致）。
+
+路径参数：medicineId : string, 药品ID
+请求体  : 同接口3（不含 userId，userId 由后端根据登录态获取）。
+响应 data（Medicine）：更新后的完整药品记录。
+
+--------------------------------------------------------------------------------
+5. 删除药品
+--------------------------------------------------------------------------------
+URL    : DELETE {baseUrl}/medicines/{medicineId}
+描述   : 列表【删除】按钮，前端弹出确认框，确认后调用。
+        建议后端采用逻辑删除（del_flag=1）。
+
+路径参数：medicineId : string, 药品ID
+响应 data（boolean）：true=删除成功。
+
+--------------------------------------------------------------------------------
+6. 吃药时间区分码表
+--------------------------------------------------------------------------------
+URL    : GET {baseUrl}/codes/intake-time
+描述   : 获取"吃药时间区分"下拉选项，前端缓存后用于 POP 下拉及列表名称显示。
+
+响应 data（CodeItem[]）：
+[
+  { "codeId": "001", "displayOrder": 1, "codeName": "餐前" },
+  { "codeId": "002", "displayOrder": 2, "codeName": "随餐" },
+  { "codeId": "003", "displayOrder": 3, "codeName": "餐后" }
+]
+
+================================================================================
+附录A：Medicine 数据结构（与 medicine 表字段一一对应）
+================================================================================
+{
+  "userId":           string,  // 用户ID（主键1）        user_mst.user_id
+  "medicineId":       string,  // 药品ID（主键2）        medicine.medicine_id
+  "medicineName":     string,  // 药品名称               medicine.medicine_name
+  "manufacturer":     string,  // 生产厂家               medicine.manufacturer
+  "productionDate":   string,  // 生产日期 yyyy-MM-dd    medicine.production_date
+  "shelfLifeMonths":  number,  // 保质期(月)             medicine.shelf_life_months
+  "expiryDate":       string,  // 失效日期 yyyy-MM-dd    medicine.expiry_date（计算列）
+  "remainingQuantity":number,  // 剩余数量(盒)           medicine.remaining_quantity
+  "tabletsPerBox":    number,  // 单盒数量(片)           medicine.tablets_per_box
+  "intakeTimeCode":   string,  // 吃药时间区分           medicine.intake_time_code
+  "dailyTimes":       number,  // 每日次数               medicine.daily_times
+  "tabletsPerTime":   number,  // 每次片数               medicine.tablets_per_time
+  "remark":           string   // 备注                   medicine.remark
+}
+
+================================================================================
+附录B：前端页面对 API 的使用时机
+================================================================================
+登录页         -> 接口1
+药品检索页     -> 进入画面/点击检索：接口2 + 接口6
+               点击删除并确认：接口5
+新增/编辑 POP  -> 点击确定：接口3（新增）/ 接口4（编辑）
+               失效日期为前端实时计算展示，不额外调用 API
