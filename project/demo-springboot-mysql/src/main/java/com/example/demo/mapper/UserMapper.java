@@ -3,6 +3,7 @@ package com.example.demo.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.demo.entity.User;
 import com.example.demo.dto.UserDeptDTO;
+import com.example.demo.dto.LoginDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -19,5 +20,10 @@ public interface UserMapper extends BaseMapper<User> {
     List<UserDeptDTO> selectUserDeptList(
             @Param("name") String name,
             @Param("age") Integer age
+    );
+
+    LoginDTO login(
+            @Param("login_id") String loginId,
+            @Param("login_password") String password
     );
 }

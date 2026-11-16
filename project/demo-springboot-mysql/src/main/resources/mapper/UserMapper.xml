@@ -24,4 +24,15 @@
         ORDER BY u.id DESC
     </select>
 
+
+    <select id="login" resultType="com.example.demo.dto.LoginDTO">
+        SELECT
+        u.id,
+        u.name,
+        '0123456789' as token
+        FROM t_user u
+        where u.login_id = #{login_id}
+        AND u.login_password = #{login_password}
+        ORDER BY u.id DESC
+    </select>
 </mapper>

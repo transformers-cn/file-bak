@@ -1,0 +1,415 @@
+/* =====================================================================================
+ * 代码生成器 —— 使用说明 / 步骤文档（本文件是"说明书"，不是可运行工程代码）
+ *
+ * 项目：demo-springboot-mysql（SpringBoot 2.1.0 + MyBatis-Plus 3.5.3.1 + MySQL + Lombok）
+ * 作用：根据"指定的数据库表名"，自动生成 Entity / Mapper / Mapper XML / Service /
+ *       ServiceImpl / Controller，并保存到本项目对应目录。
+ *
+ * 本文件同时给出两套做法，任选其一：
+ *   【方案 A】MyBatis-Plus 官方代码生成器（推荐，几十张表也不用手写）
+ *   【方案 B】按下面 3.~10. 的模板手工照抄（只有一两张表时最直观）
+ *
+ * 下面 2. 的 CONFIG 区就是"虚拟表 + 虚拟路径"配置示例（表名 t_medical_record）。
+ * =====================================================================================
+ */
+
+/* =====================================================================================
+ * 1. 先看现有项目的分层约定（生成出来的文件必须和现有风格一致）
+ *
+ *   src/main/java/com/example/demo/
+ *     ├── entity/User.java                      -> @TableName + @Data + @TableId
+ *     ├── mapper/UserMapper.java                -> extends BaseMapper<User> + @Mapper
+ *     ├── service/UserService.java              -> extends IService<User>
+ *     ├── service/impl/UserServiceImpl.java     -> extends ServiceImpl<UserMapper, User>
+ *     ├── controller/UserController.java        -> @RestController + Result<T> 包装
+ *     ├── common/Result.java                    -> 统一返回（已存在，直接用，不要重复生成）
+ *     └── config/MybatisPlusConfig.java         -> 分页插件（已存在，不要重复生成）
+ *   src/main/resources/
+ *     ├── application.yml                       -> 数据源 + mybatis-plus 配置
+ *     └── mapper/UserMapper.xml                 -> 只有"多表联查/复杂 SQL"才需要
+ *
+ *   启动类 DemoSpringbootMysqlApplication 上已有 @MapperScan("com.example.demo.mapper")，
+ *   所以新生成的 Mapper 只要放在这个包下，就【不需要】再加 @MapperScan。
+ * =====================================================================================
+ */
+
+/* =====================================================================================
+ * 2. 【虚拟配置区】—— 换表时只改这里（示例表：t_medical_record 就诊记录表）
+ *
+ *   ┌── 数据库 ────────────────────────────────────────────────────────────────┐
+ *   │ url      = jdbc:mysql://localhost:3306/demo_db?useUnicode=true
+ *   │            &characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+ *   │            &allowPublicKeyRetrieval=true
+ *   │ username = root
+ *   │ password = 1234567890
+ *   │ 表名     = t_medical_record            （虚拟表，替换成你的真实表名）
+ *   │ 主键     = record_id  BIGINT AUTO_INCREMENT
+ *   └──────────────────────────────────────────────────────────────────────────┘
+ *   ┌── 输出路径（相对项目根目录 demo-springboot-mysql/）────────────────────┐
+ *   │ parent 包        = com.example.demo
+ *   │ Entity     -> src/main/java/com/example/demo/entity/MedicalRecord.java
+ *   │ Mapper     -> src/main/java/com/example/demo/mapper/MedicalRecordMapper.java
+ *   │ Mapper XML -> src/main/resources/mapper/MedicalRecordMapper.xml
+ *   │ Service    -> src/main/java/com/example/demo/service/MedicalRecordService.java
+ *   │ ServiceImpl-> src/main/java/com/example/demo/service/impl/MedicalRecordServiceImpl.java
+ *   │ Controller -> src/main/java/com/example/demo/controller/MedicalRecordController.java
+ *   └──────────────────────────────────────────────────────────────────────────┘
+ *   ┌── 虚拟表结构（DESC t_medical_record; 的结果，用于填字段）────────────────┐
+ *   │ record_id        BIGINT      NOT NULL AUTO_INCREMENT  主键
+ *   │ patient_name     VARCHAR(64)                          患者姓名
+ *   │ patient_age      INT                                  患者年龄
+ *   │ visit_date       DATE                                 就诊日期
+ *   │ diagnosis        VARCHAR(500)                         诊断结论
+ *   │ total_fee        DECIMAL(10,2)                         费用
+ *   │ del_flag         TINYINT     DEFAULT 0                删除标志
+ *   │ create_user      VARCHAR(50)                          创建人
+ *   │ create_time      DATETIME                             创建时间
+ *   │ update_user      VARCHAR(50)                          更新人
+ *   │ update_time      DATETIME                             更新时间
+ *   └──────────────────────────────────────────────────────────────────────────┘
+ *
+ *   命名换算规则（表名/列名 -> Java 名）：
+ *     表名   t_medical_record  -> 去前缀 t_ -> medical_record -> 大驼峰 MedicalRecord
+ *     列名   patient_name      -> 小驼峰   patientName （application.yml 已开
+ *                                  map-underscore-to-camel-case: true，无需 @TableField）
+ *     例外：列名不符合下划线规范时，必须在实体上写 @TableField("列名")
+ *
+ *   类型映射表（MySQL -> Java，MyBatis-Plus 3.5.x 默认）：
+ *     BIGINT        -> Long            INT/INT4  -> Integer     TINYINT -> Integer
+ *     VARCHAR/CHAR/TEXT -> String      DECIMAL/NUMERIC -> java.math.BigDecimal
+ *     DATE          -> java.time.LocalDate
+ *     DATETIME/TIMESTAMP -> java.time.LocalDateTime
+ *     TIME          -> java.time.LocalTime       BOOLEAN/BIT -> Boolean
+ *     （JDK8 工程，pom 里 java.version=1.8，用 java.time 不要用 java.util.Date）
+ * =====================================================================================
+ */
+
+/* =====================================================================================
+ * 3. 生成步骤总览（六步）
+ *   步骤1 建表并确认结构   -> 步骤2 改数据源     -> 步骤3 生成 Entity
+ *   步骤4 生成 Mapper(+XML) -> 步骤5 生成 Service/Impl -> 步骤6 生成 Controller + 启动验证
+ * =====================================================================================
+ */
+
+/* =====================================================================================
+ * 4. 【方案 A】用 MyBatis-Plus 官方生成器（推荐）
+ *
+ * 4.1 临时在 pom.xml 的 <dependencies> 中加入（生成完可以删掉，加 test/provided 作用域更干净）：
+ *
+ *   <dependency>
+ *       <groupId>com.baomidou</groupId>
+ *       <artifactId>mybatis-plus-generator</artifactId>
+ *       <version>3.5.3.1</version>
+ *   </dependency>
+ *   <dependency>
+ *       <groupId>org.apache.velocity</groupId>
+ *       <artifactId>velocity-engine-core</artifactId>
+ *       <version>2.3</version>
+ *   </dependency>
+ *
+ * 4.2 在 src/test/java/com/example/demo/CodeGenerator.java 写如下生成器入口
+ *     （注意：MP 3.5.3 用旧版 FastAutoGenerator 最省事；新版 builder API 字段名不同）：
+ *
+ *     package com.example.demo;
+ *
+ *     import com.baomidou.mybatisplus.generator.FastAutoGenerator;
+ *     import com.baomidou.mybatisplus.generator.config.OutputConfig;
+ *     import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
+ *     import java.util.Collections;
+ *
+ *     public class CodeGenerator {
+ *         public static void main(String[] args) {
+ *             FastAutoGenerator.create(
+ *                             "jdbc:mysql://localhost:3306/demo_db?useUnicode=true&characterEncoding=utf8"
+ *                                     + "&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true",
+ *                             "root", "1234567890")
+ *                     .globalConfig(b -> b
+ *                             .author("yourName")
+ *                             .disableOpenDir()
+ *                             // ★ 输出到项目源码目录（Windows 用反斜杠或双斜杠）
+ *                             .outputDir("src/main/java"))
+ *                     .packageConfig(b -> b
+ *                             .parent("com.example.demo")
+ *                             .moduleName("")            // 不要多出 demo 层级
+ *                             .entity("entity").mapper("mapper")
+ *                             .service("service").serviceImpl("service.impl")
+ *                             .controller("controller")
+ *                             // ★ XML 不生成到 java 目录，改到 resources/mapper
+ *                             .pathInfo(Collections.singletonMap(
+ *                                     OutputConfig.xml(), "src/main/resources/mapper")))
+ *                     .strategyConfig(b -> b
+ *                             .addInclude("t_medical_record")     // ★ 指定表名，可多张
+ *                             .addTablePrefix("t_")               // ★ 去掉表前缀
+ *                             .entityBuilder()
+ *                             .naming(NamingStrategy.underline_to_camel)
+ *                             .columnNaming(NamingStrategy.underline_to_camel)
+ *                             .logicDeleteColumnName("del_flag")  // 逻辑删除列
+ *                             .controllerBuilder().enableRestStyle()
+ *                             .enableFileOverride())              // 覆盖旧文件
+ *                     .execute();
+ *         }
+ *     }
+ *
+ * 4.3 运行：IDEA 里右键 main -> Run（或 mvn -q compile exec:java 之类）。
+ *
+ * 4.4 ★★ 生成后【必须手工修改】的地方（这是重点，生成器不会替你做）：
+ *
+ *   (1) 生成器默认输出目录带模块名/绝对路径
+ *       -> 确认文件真实落在 src/main/java/com/example/demo/entity 等目录；
+ *          若落在项目根的子目录，手工剪切过去。
+ *   (2) Lombok
+ *       生成器默认产出 getter/setter。项目已用 Lombok，可把实体改成
+ *           @Data + @TableName("t_medical_record") + @TableId(value="record_id", type=IdType.AUTO)
+ *       （参考 src/main/java/com/example/demo/entity/User.java）。
+ *   (3) 主键
+ *       自增主键必须显式写 @TableId(type = IdType.AUTO)；
+ *       复合主键（如 t_medicine 的 user_id+medicine_id）MP 不支持 @TableId 多主键，
+ *       需要自己指定一个业务主键或改用手写 SQL。
+ *   (4) 时间/金额类型
+ *       把 java.util.Date 改成 LocalDateTime / LocalDate / BigDecimal；
+ *       实体里去掉 @JsonFormat 之类生成器附加的注解，保持与 User.java 一致。
+ *   (5) Controller 返回体
+ *       生成器返回裸对象/AjaxResult，项目统一用 com.example.demo.common.Result<T>：
+ *           return Result.ok(service.xxx());   // 成功
+ *           return Result.fail("xxx");         // 失败
+ *       并删掉生成器自带的 @RequestMapping 前缀冲突（参考 UserController 的写法）。
+ *   (6) Mapper 注解
+ *       项目靠启动类 @MapperScan 扫描，生成器多加的 @Mapper / @Repository 可保留也可删，
+ *       不要重复添加多个扫描方式。
+ *   (7) XML
+ *       生成器会生成一份空 <mapper> XML。application.yml 的
+ *       mapper-locations=classpath*:/mapper/**/*.xml 已能扫到；
+ *       若没有自定义 SQL，可以直接删除该 XML（MP 单表 CRUD 不需要 XML）。
+ *   (8) Service 接口包路径
+ *       生成器可能生成 service/impl 到 com/example/demo/service/impl，确认与现有
+ *       UserServiceImpl 同级；接口上不要继承生成器自定义的 IService 变体。
+ *   (9) 依赖清理
+ *       生成完成后把 mybatis-plus-generator / velocity-engine-core 从 pom 移除或改 scope，
+ *       避免打进生产 jar。
+ *  10  编译验证：mvn -q -DskipTests compile 通过后再启动。
+ * =====================================================================================
+ */
+
+/* =====================================================================================
+ * 5. 【方案 B】手工模板（一）—— Entity
+ *    文件：src/main/java/com/example/demo/entity/MedicalRecord.java
+ * =====================================================================================
+package com.example.demo.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Data
+@TableName("t_medical_record")
+public class MedicalRecord {
+
+    @TableId(value = "record_id", type = IdType.AUTO)
+    private Long recordId;              // record_id  主键
+
+    private String patientName;         // patient_name 患者姓名
+
+    private Integer patientAge;         // patient_age 患者年龄
+
+    private LocalDate visitDate;        // visit_date   就诊日期
+
+    private String diagnosis;           // diagnosis    诊断结论
+
+    private BigDecimal totalFee;        // total_fee    费用
+
+    @TableLogic
+    private Integer delFlag;            // del_flag     0-正常 1-已删除
+
+    private String createUser;          // create_user  创建人
+
+    private LocalDateTime createTime;   // create_time  创建时间
+
+    private String updateUser;          // update_user  更新人
+
+    private LocalDateTime updateTime;   // update_time  更新时间
+}
+ *
+ * ★ 需要改的地方：
+ *   - @TableName 必须写真实表名（表名与类名不完全等价时必须写）。
+ *   - 主键列名不是 id 时，@TableId 要写 value。
+ *   - 有 del_flag 才加 @TableLogic；同时在 application.yml 里配置
+ *         mybatis-plus.global-config.db-config.logic-delete-field: delFlag
+ *         mybatis-plus.global-config.db-config.logic-delete-value: 1
+ *         mybatis-plus.global-config.db-config.logic-not-delete-value: 0
+ *     否则 @TableLogic 不生效（本项目当前只配了 id-type: auto）。
+ *   - 字段名不符合"下划线转驼峰"时补 @TableField("真实列名")。
+ * =====================================================================================
+ */
+
+/* =====================================================================================
+ * 6. 【方案 B】手工模板（二）—— Mapper 接口
+ *    文件：src/main/java/com/example/demo/mapper/MedicalRecordMapper.java
+ * =====================================================================================
+package com.example.demo.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.example.demo.entity.MedicalRecord;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
+
+/** 继承 BaseMapper 后即拥有单表 CRUD 能力，无需写 XML。 */
+@Mapper
+@Repository
+public interface MedicalRecordMapper extends BaseMapper<MedicalRecord> {
+    // 只有多表联查 / 复杂统计才在这里加方法，并在同名 XML 里实现
+}
+ *
+ * ★ 需要改的地方：
+ *   - 泛型必须换成新实体；包名必须是 com.example.demo.mapper（否则 @MapperScan 扫不到）。
+ *   - 自定义方法的参数一律加 @Param("xxx")，否则 XML 里取不到值。
+ * =====================================================================================
+ */
+
+/* =====================================================================================
+ * 7. 【方案 B】手工模板（三）—— Mapper XML（无自定义 SQL 时可跳过）
+ *    文件：src/main/resources/mapper/MedicalRecordMapper.xml
+ * =====================================================================================
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.MedicalRecordMapper">
+
+    <select id="selectByPatientName" resultType="com.example.demo.entity.MedicalRecord">
+        SELECT record_id, patient_name, patient_age, visit_date, diagnosis, total_fee
+        FROM t_medical_record
+        WHERE del_flag = 0
+        <if test="patientName != null and patientName != ''">
+            AND patient_name LIKE CONCAT('%', #{patientName}, '%')
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>
+ *
+ * ★ 需要改的地方：
+ *   - namespace 必须等于 Mapper 接口全限定名，否则会 "Invalid bound statement"。
+ *   - <select id> 必须等于接口方法名。
+ *   - 返回多表结果时 resultType 指向 dto 包（application.yml 的
+ *     type-aliases-package: com.example.demo.dto 已配置别名）。
+ *   - 路径必须在 resources/mapper/ 下，与 mapper-locations 匹配。
+ * =====================================================================================
+ */
+
+/* =====================================================================================
+ * 8. 【方案 B】手工模板（四）—— Service 接口 + 实现
+ *    文件：src/main/java/com/example/demo/service/MedicalRecordService.java
+ * =====================================================================================
+package com.example.demo.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.demo.entity.MedicalRecord;
+
+public interface MedicalRecordService extends IService<MedicalRecord> {
+    // 自定义业务方法写在这里
+}
+ *
+ *    文件：src/main/java/com/example/demo/service/impl/MedicalRecordServiceImpl.java
+ * =====================================================================================
+package com.example.demo.service.impl;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.demo.entity.MedicalRecord;
+import com.example.demo.mapper.MedicalRecordMapper;
+import com.example.demo.service.MedicalRecordService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MedicalRecordServiceImpl
+        extends ServiceImpl<MedicalRecordMapper, MedicalRecord>
+        implements MedicalRecordService {
+
+    @Autowired
+    private MedicalRecordMapper medicalRecordMapper;
+}
+ *
+ * ★ 需要改的地方：
+ *   - ServiceImpl 的两个泛型顺序是 <Mapper, Entity>，写反会编译不过。
+ *   - 实现类必须在 com.example.demo.service.impl（组件扫描范围内）。
+ *   - 简单 CRUD 直接用 this.baseMapper / this.lambdaQuery()，不必重复注入 Mapper。
+ * =====================================================================================
+ */
+
+/* =====================================================================================
+ * 9. 【方案 B】手工模板（五）—— Controller
+ *    文件：src/main/java/com/example/demo/controller/MedicalRecordController.java
+ * =====================================================================================
+package com.example.demo.controller;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.demo.common.Result;
+import com.example.demo.entity.MedicalRecord;
+import com.example.demo.service.MedicalRecordService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/medicalRecord")
+public class MedicalRecordController {
+
+    @Autowired
+    private MedicalRecordService medicalRecordService;
+
+    @GetMapping("/page")
+    public Result<IPage<MedicalRecord>> page(@RequestParam(defaultValue = "1") long current,
+                                             @RequestParam(defaultValue = "10") long size) {
+        return Result.ok(medicalRecordService.page(new Page<>(current, size)));
+    }
+
+    @GetMapping("/{id}")
+    public Result<MedicalRecord> getById(@PathVariable Long id) {
+        return Result.ok(medicalRecordService.getById(id));
+    }
+
+    @PostMapping("/save")
+    public Result<Boolean> save(@RequestBody MedicalRecord record) {
+        return Result.ok(medicalRecordService.save(record));
+    }
+
+    @PutMapping("/update")
+    public Result<Boolean> update(@RequestBody MedicalRecord record) {
+        return Result.ok(medicalRecordService.updateById(record));
+    }
+
+    @DeleteMapping("/{id}")
+    public Result<Boolean> remove(@PathVariable Long id) {
+        return Result.ok(medicalRecordService.removeById(id));
+    }
+}
+ *
+ * ★ 需要改的地方：
+ *   - 返回值统一包 com.example.demo.common.Result，不要返回裸对象。
+ *   - 分页必须用 MP 的 Page/IPage（分页插件已在 config/MybatisPlusConfig 注册，无需再加）。
+ *   - 路径前缀 /medicalRecord 与前端约定保持一致，避免与已有 Controller 冲突。
+ * =====================================================================================
+ */
+
+/* =====================================================================================
+ * 10. 生成完之后的"必查清单"（按顺序过一遍）
+ *   [ ] pom.xml          是否临时加了 generator/velocity，用完是否移除
+ *   [ ] application.yml  数据源 url/username/password 是否为本机真实值
+ *                        （参考根目录《如何连接本地MySQL.txt》）
+ *                        用了逻辑删除就补 logic-delete-field 三项配置
+ *   [ ] 数据库           表是否已在 demo_db 建好（sql/init.sql 里补一份建表语句，便于他人复现）
+ *   [ ] Entity           @TableName / @TableId / 类型（LocalDate、BigDecimal）/ @TableLogic
+ *   [ ] Mapper           包路径 com.example.demo.mapper、泛型、@Param
+ *   [ ] XML              namespace、id、resultType；无自定义 SQL 可删
+ *   [ ] Service/Impl     泛型顺序、@Service、扫描包
+ *   [ ] Controller       Result 包装、请求路径、分页对象
+ *   [ ] 编译             mvn -q -DskipTests compile
+ *   [ ] 启动             mvn spring-boot:run ，控制台看到 SQL 日志（log-impl 已开 StdOutImpl）
+ *   [ ] 冒烟             curl http://localhost:8080/medicalRecord/page?current=1&size=10
+ * =====================================================================================
+ */
