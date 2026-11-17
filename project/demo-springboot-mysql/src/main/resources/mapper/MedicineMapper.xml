@@ -24,11 +24,14 @@
         left join t_code_mst tcm
         on tcm.code_type_id = '001'
         and tcm.code_id = tm.intake_time_code
-        <where>
+        where
+            tm.user_id = #{userId}
             <if test="medicineName != null and medicineName != ''">
                 AND medicine_name LIKE CONCAT('%', #{medicineName}, '%')
             </if>
-        </where>
         ORDER BY medicine_id DESC
+    </select>
+    <select id="getMaxMedicineId" resultType="java.lang.String">
+        select MAX(medicine_id) as maxMedicineId from t_medicine where user_id = '1'
     </select>
 </mapper>

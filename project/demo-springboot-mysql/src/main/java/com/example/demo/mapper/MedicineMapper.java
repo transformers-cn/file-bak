@@ -16,6 +16,8 @@ import java.util.List;
 @Repository
 public interface MedicineMapper extends BaseMapper<Medicine> {
     List<MedicineRecordDTO> selectMedicineRecordList(
+            @Param("userId") String userId,
             @Param("medicineName") String medicineName
     );
+    String getMaxMedicineId(@Param("userId") String userId);
 }

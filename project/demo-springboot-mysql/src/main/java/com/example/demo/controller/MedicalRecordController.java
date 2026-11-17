@@ -1,5 +1,9 @@
 package com.example.demo.controller;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.example.demo.common.Result;
 import com.example.demo.dto.MedicineRecordDTO;
 import com.example.demo.entity.Medicine;
@@ -75,7 +79,34 @@ public class MedicalRecordController {
 //        return Result.ok(userService.list(wrapper));
 //    }
     @PostMapping("/search-medical-record")
-    public Result<List<MedicineRecordDTO>> searchPostUserInfo(@RequestBody Medicine medicine) {
-        return Result.ok(medicalRecordService.listMedicineRecords(medicine.getMedicine_name()));
+    public Result<List<MedicineRecordDTO>> searchMedicalRecord(@RequestBody Medicine medicine) {
+        return Result.ok(medicalRecordService.listMedicineRecords(medicine.getUserId(),medicine.getMedicineName()));
+    }
+
+    /** 新增：POST */
+    @PostMapping("/save-medical-record")
+    public Result<Boolean> save(@RequestBody MedicineRecordDTO medicineRecordDTO) {
+        medicineRecordDTO.setAddOrUpdateFlag("0");
+        if(medicalRecordService.checkForSaveMedicineRecord(medicineRecordDTO)){
+            return Result.ok(medicalRecordService.makeSaveDataForMedicineRecord(medicineRecordDTO));
+        }
+        return Result.fail("insert data error!");
+    }
+    /** 按 id 删除：DELETE */
+    @DeleteMapping("/delete-medical-record")
+    public Result<Boolean> remove(@RequestBody MedicineRecordDTO medicineRecordDTO) {
+        LambdaQueryWrapper<Medicine> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(medicineRecordDTO != null && medicineRecordDTO.getUserId() != null, Medicine::getUserId, medicineRecordDTO.getUserId())
+                .eq(medicineRecordDTO != null && medicineRecordDTO.getMedicineId() != null, Medicine::getMedicineId, medicineRecordDTO.getMedicineId());
+        return Result.ok(medicalRecordService.remove(queryWrapper));
+    }
+    /** 更新：POST */
+    @PostMapping("/update-medical-record")
+    public Result<Boolean> update(@RequestBody MedicineRecordDTO medicineRecordDTO) {
+        medicineRecordDTO.setAddOrUpdateFlag("1");
+        if(medicalRecordService.checkForSaveMedicineRecord(medicineRecordDTO)){
+            return Result.ok(medicalRecordService.makeUpdateDataForMedicineRecord(medicineRecordDTO));
+        }
+        return Result.fail("update data error!");
     }
 }
