@@ -78,9 +78,14 @@ public class MedicalRecordController {
 //        wrapper.eq(user != null && user.getAge() != null, User::getAge, user.getAge());
 //        return Result.ok(userService.list(wrapper));
 //    }
-    @PostMapping("/search-medical-record")
-    public Result<List<MedicineRecordDTO>> searchMedicalRecord(@RequestBody Medicine medicine) {
-        return Result.ok(medicalRecordService.listMedicineRecords(medicine.getUserId(),medicine.getMedicineName()));
+//    @PostMapping("/search-medical-record")
+//    public Result<List<MedicineRecordDTO>> searchMedicalRecord(@RequestBody Medicine medicine) {
+//        return Result.ok(medicalRecordService.listMedicineRecords(medicine.getUserId(),medicine.getMedicineName()));
+//    }
+
+    @GetMapping("/search-medical-record")
+    public Result<List<MedicineRecordDTO>> searchMedicalRecord(@RequestParam(required = false) String userId,@RequestParam(required = false) String medicineName) {
+        return Result.ok(medicalRecordService.listMedicineRecords(userId,medicineName));
     }
 
     /** 新增：POST */

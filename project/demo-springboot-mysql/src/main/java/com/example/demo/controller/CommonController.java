@@ -1,0 +1,33 @@
+package com.example.demo.controller;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.example.demo.common.Result;
+import com.example.demo.dto.LoginDTO;
+import com.example.demo.entity.CodeMst;
+import com.example.demo.entity.Medicine;
+import com.example.demo.service.CodeMstService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * Common API。
+ */
+@RestController
+@RequestMapping("/api/common")
+public class CommonController {
+
+    private final CodeMstService codeMstService;
+
+    public CommonController(CodeMstService codeMstService) {
+        this.codeMstService = codeMstService;
+    }
+
+    @GetMapping ("/codes/intake-time")
+    public Result<List<CodeMst>> searchCodeMstAll() {
+        LambdaQueryWrapper<CodeMst> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CodeMst::getCodeTypeId, "001");
+
+        return Result.ok(codeMstService.list(queryWrapper));
+    }
+}

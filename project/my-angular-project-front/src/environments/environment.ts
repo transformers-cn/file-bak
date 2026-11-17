@@ -5,5 +5,5 @@ export const environment = {
    */
   apiBaseUrl: 'http://localhost:8080/api',
   /** 是否使用本地 Mock 数据（true：不发真实请求，false：请求真实后端） */
-  useMock: true
+  useMock: false
 };

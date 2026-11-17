@@ -12,6 +12,7 @@ import { MedicineService } from '../../services/medicine.service';
 })
 export class MedicineListComponent implements OnInit {
 
+  userId = '';
   userName = '';
   searchKeyword = '';
   list: Medicine[] = [];
@@ -34,6 +35,7 @@ export class MedicineListComponent implements OnInit {
 
   ngOnInit(): void {
     const user = this.auth.getLoginUser();
+    this.userId = user ? user.userId : '';
     if (!user) {
       this.router.navigate(['/login']);
       return;
@@ -48,7 +50,11 @@ export class MedicineListComponent implements OnInit {
   /** 检索 */
   search(): void {
     this.loading = true;
-    this.medicineService.search(this.searchKeyword.trim()).subscribe(result => {
+    const user = this.auth.getLoginUser();
+    this.medicineService.search(this.userId,this.searchKeyword.trim()).subscribe(result => {
+      debugger
+      console.log(result);
+      console.log(result.list);
       this.list = result.list;
       this.loading = false;
     });

@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.common.Result;
 import com.example.demo.dto.LoginDTO;
-import com.example.demo.entity.User;
+import com.example.demo.form.LoginForm;
 import com.example.demo.service.LoginService;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +20,7 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public Result<LoginDTO> searchPost(@RequestBody User user) {
-        return Result.ok(loginService.login(user.getLogin_id(),user.getLogin_password()));
+    public Result<LoginDTO> searchPost(@RequestBody LoginForm loginForm) {
+        return Result.ok(loginService.login(loginForm.getUsername(),loginForm.getPassword()));
     }
 }

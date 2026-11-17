@@ -40,13 +40,13 @@ export function calcExpiryDate(productionDate: string, shelfLifeMonths: number):
 @Injectable({ providedIn: 'root' })
 export class MedicineService {
 
-  private readonly baseUrl = `${environment.apiBaseUrl}/medicines`;
-  private readonly codeUrl = `${environment.apiBaseUrl}/codes/intake-time`;
+  private readonly baseUrl = `${environment.apiBaseUrl}/medicalRecord/search-medical-record`;
+  private readonly codeUrl = `${environment.apiBaseUrl}/common/codes/intake-time`;
 
   constructor(private http: HttpClient) {}
 
   /** 药品检索：按药品名称模糊查询 */
-  search(medicineName: string): Observable<MedicineListResult> {
+  search(userId: string,medicineName: string): Observable<MedicineListResult> {
     if (environment.useMock) {
       const list = MockDb.medicines.filter(
         m => !medicineName || m.medicineName.indexOf(medicineName) !== -1
@@ -54,8 +54,21 @@ export class MedicineService {
       const result: MedicineListResult = { total: list.length, list: list.map(m => ({ ...m })) };
       return of(result).pipe(delay(200));
     }
+    const tempResult:any = this.http
+      .get<ApiResponse<MedicineListResult>>(this.baseUrl, { params: { userId:userId,medicineName: medicineName || '' } })
+      .pipe(map(res => res.data));
+
+    
+    this.http
+      .get<ApiResponse<MedicineListResult>>(this.baseUrl, { params: { userId:userId,medicineName: medicineName || '' } })
+      .subscribe(res => {
+
+      });
+    
+    console.log("===tempResult==="+tempResult);
+    debugger
     return this.http
-      .get<ApiResponse<MedicineListResult>>(this.baseUrl, { params: { medicineName: medicineName || '' } })
+      .get<ApiResponse<MedicineListResult>>(this.baseUrl, { params: { userId:userId,medicineName: medicineName || '' } })
       .pipe(map(res => res.data));
   }
 

@@ -27,8 +27,8 @@
 
     <select id="login" resultType="com.example.demo.dto.LoginDTO">
         SELECT
-        u.id,
-        u.name,
+        u.id as userId,
+        u.name as userName,
         '0123456789' as token
         FROM t_user u
         where u.login_id = #{login_id}

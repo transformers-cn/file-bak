@@ -4,7 +4,7 @@
   "description": "药品管理系统前端（Angular 11，适配本机 Node 10.x）",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.config.json",
     "build": "ng build",
     "build:prod": "ng build --prod"
   },
