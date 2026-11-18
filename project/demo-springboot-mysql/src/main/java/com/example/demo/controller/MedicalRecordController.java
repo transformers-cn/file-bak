@@ -99,7 +99,7 @@ public class MedicalRecordController {
         return Result.fail("insert data error!");
     }
     /** 按 id 删除：DELETE */
-    @DeleteMapping("/delete-medical-record")
+    @PostMapping("/delete-medical-record")
     public Result<Boolean> remove(@RequestBody MedicineRecordDTO medicineRecordDTO) {
         LambdaQueryWrapper<Medicine> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(medicineRecordDTO != null && medicineRecordDTO.getUserId() != null, Medicine::getUserId, medicineRecordDTO.getUserId())
@@ -114,5 +114,6 @@ public class MedicalRecordController {
             return Result.ok(medicalRecordService.makeUpdateDataForMedicineRecord(medicineRecordDTO));
         }
         return Result.fail("update data error!");
+//        return Result.ok();
     }
 }

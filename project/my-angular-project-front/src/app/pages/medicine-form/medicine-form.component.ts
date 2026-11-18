@@ -81,9 +81,12 @@ export class MedicineFormComponent implements OnInit {
       this.submitting = true;
       const payload: MedicineSaveRequest = { ...f, medicineName: f.medicineName.trim() };
       if (this.medicine) {
-        this.medicineService.update(this.medicine.medicineId, payload)
+        debugger
+        const user = this.auth.getLoginUser();
+        this.medicineService.update(this.medicine.medicineId, payload, user ? user.userId : '')
           .subscribe(() => this.saved.emit());
       } else {
+        debugger
         const user = this.auth.getLoginUser();
         this.medicineService.create(payload, user ? user.userId : '')
           .subscribe(() => this.saved.emit());

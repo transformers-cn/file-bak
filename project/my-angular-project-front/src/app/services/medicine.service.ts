@@ -42,6 +42,9 @@ export class MedicineService {
 
   private readonly baseUrl = `${environment.apiBaseUrl}/medicalRecord/search-medical-record`;
   private readonly codeUrl = `${environment.apiBaseUrl}/common/codes/intake-time`;
+  private readonly saveUrl = `${environment.apiBaseUrl}/medicalRecord/save-medical-record`;
+  private readonly updateUrl = `${environment.apiBaseUrl}/medicalRecord/update-medical-record`;
+  private readonly deleteUrl = `${environment.apiBaseUrl}/medicalRecord/delete-medical-record`;
 
   constructor(private http: HttpClient) {}
 
@@ -81,21 +84,68 @@ export class MedicineService {
       MockDb.medicines.push(medicine);
       return of({ ...medicine }).pipe(delay(200));
     }
+
+    const medicine: Medicine = {
+      userId,
+      medicineId: MockDb.nextMedicineId(),
+      medicineName: req.medicineName,
+      manufacturer: req.manufacturer,
+      productionDate: req.productionDate,
+      shelfLifeMonths: req.shelfLifeMonths,
+      expiryDate: calcExpiryDate(req.productionDate, req.shelfLifeMonths),
+      remainingQuantity: req.addQuantity,
+      tabletsPerBox: req.tabletsPerBox,
+      intakeTimeCode: req.intakeTimeCode,
+      dailyTimes: req.dailyTimes,
+      tabletsPerTime: req.tabletsPerTime,
+      remark: req.remark
+    };
+
     return this.http
-      .post<ApiResponse<Medicine>>(this.baseUrl, { ...req, userId })
+      .post<ApiResponse<Medicine>>(this.saveUrl, { ...medicine, userId })
       .pipe(map(res => res.data));
   }
 
   /** 编辑药品（新增数量按累加处理） */
-  update(medicineId: string, req: MedicineSaveRequest): Observable<Medicine> {
-    if (environment.useMock) {
-      const idx = MockDb.medicines.findIndex(m => m.medicineId === medicineId);
-      if (idx === -1) {
-        return throwError('药品不存在');
-      }
-      const old = MockDb.medicines[idx];
-      const updated: Medicine = {
+  update(medicineId: string, req: MedicineSaveRequest, userId: string): Observable<Medicine> {
+    // if (environment.useMock) {
+    //   const idx = MockDb.medicines.findIndex(m => m.medicineId === medicineId);
+    //   if (idx === -1) {
+    //     return throwError('药品不存在');
+    //   }
+    //   const old = MockDb.medicines[idx];
+    //   const updated: Medicine = {
+    //     ...old,
+    //     userId: userId,
+    //     medicineId: medicineId,
+    //     medicineName: req.medicineName,
+    //     manufacturer: req.manufacturer,
+    //     productionDate: req.productionDate,
+    //     shelfLifeMonths: req.shelfLifeMonths,
+    //     expiryDate: calcExpiryDate(req.productionDate, req.shelfLifeMonths),
+    //     remainingQuantity: old.remainingQuantity + req.addQuantity,
+    //     tabletsPerBox: req.tabletsPerBox,
+    //     intakeTimeCode: req.intakeTimeCode,
+    //     dailyTimes: req.dailyTimes,
+    //     tabletsPerTime: req.tabletsPerTime,
+    //     remark: req.remark
+    //   };
+    //   MockDb.medicines[idx] = updated;
+    //   return of({ ...updated }).pipe(delay(200));
+    // }
+    // return this.http
+    //   .put<ApiResponse<Medicine>>(`${this.baseUrl}/${medicineId}`, req)
+    //   .pipe(map(res => res.data));
+    debugger
+    const idx = MockDb.medicines.findIndex(m => m.medicineId === medicineId);
+    if (idx === -1) {
+      return throwError('药品不存在');
+    }
+    const old = MockDb.medicines[idx];
+    const updated: Medicine = {
         ...old,
+        userId: userId,
+        medicineId: medicineId,
         medicineName: req.medicineName,
         manufacturer: req.manufacturer,
         productionDate: req.productionDate,
@@ -108,16 +158,13 @@ export class MedicineService {
         tabletsPerTime: req.tabletsPerTime,
         remark: req.remark
       };
-      MockDb.medicines[idx] = updated;
-      return of({ ...updated }).pipe(delay(200));
-    }
     return this.http
-      .put<ApiResponse<Medicine>>(`${this.baseUrl}/${medicineId}`, req)
+      .post<ApiResponse<Medicine>>(this.updateUrl, { ...updated })
       .pipe(map(res => res.data));
   }
 
   /** 删除药品 */
-  remove(medicineId: string): Observable<boolean> {
+  remove(medicineId: string,userId: string): Observable<boolean> {
     if (environment.useMock) {
       const idx = MockDb.medicines.findIndex(m => m.medicineId === medicineId);
       if (idx !== -1) {
@@ -125,8 +172,12 @@ export class MedicineService {
       }
       return of(idx !== -1).pipe(delay(200));
     }
+    const removeMedicine: any = {
+      userId: userId,
+      medicineId: medicineId
+    };
     return this.http
-      .delete<ApiResponse<boolean>>(`${this.baseUrl}/${medicineId}`)
+      .post<ApiResponse<boolean>>(this.deleteUrl, { ...removeMedicine })
       .pipe(map(res => res.data));
   }
 

@@ -88,7 +88,8 @@ export class MedicineListComponent implements OnInit {
   /** 删除：先提示确认，再从列表删除 */
   confirmDelete(item: Medicine): void {
     if (window.confirm(`确定要删除药品「${item.medicineName}」吗？`)) {
-      this.medicineService.remove(item.medicineId).subscribe(() => this.search());
+      const user = this.auth.getLoginUser();
+      this.medicineService.remove(item.medicineId, user ? user.userId : '').subscribe(() => this.search());
     }
   }
 
