@@ -21,6 +21,9 @@ export function calcExpiryDate(productionDate: string, shelfLifeMonths: number):
   if (!productionDate || shelfLifeMonths == null) {
     return '';
   }
+  if(typeof shelfLifeMonths === 'string'){
+    shelfLifeMonths = parseInt(shelfLifeMonths, 10);
+  }
   const [y, m, d] = productionDate.split('-').map(Number);
   const date = new Date(y, m - 1 + shelfLifeMonths, d);
   const mm = ('0' + (date.getMonth() + 1)).slice(-2);
