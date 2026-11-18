@@ -52,9 +52,6 @@ export class MedicineListComponent implements OnInit {
     this.loading = true;
     const user = this.auth.getLoginUser();
     this.medicineService.search(this.userId,this.searchKeyword.trim()).subscribe(result => {
-      debugger
-      console.log(result);
-      console.log(result.list);
       this.list = result.list;
       this.loading = false;
     });

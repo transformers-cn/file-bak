@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.example.demo.common.Result;
 import com.example.demo.dto.MedicineRecordDTO;
+import com.example.demo.dto.SearchMedicineRecordListDTO;
 import com.example.demo.entity.Medicine;
 import com.example.demo.service.MedicalRecordService;
 import org.springframework.web.bind.annotation.*;
@@ -84,7 +85,7 @@ public class MedicalRecordController {
 //    }
 
     @GetMapping("/search-medical-record")
-    public Result<List<MedicineRecordDTO>> searchMedicalRecord(@RequestParam(required = false) String userId,@RequestParam(required = false) String medicineName) {
+    public Result<SearchMedicineRecordListDTO> searchMedicalRecord(@RequestParam(required = false) String userId, @RequestParam(required = false) String medicineName) {
         return Result.ok(medicalRecordService.listMedicineRecords(userId,medicineName));
     }
 

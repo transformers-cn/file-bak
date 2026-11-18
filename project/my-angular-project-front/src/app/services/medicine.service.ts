@@ -54,19 +54,7 @@ export class MedicineService {
       const result: MedicineListResult = { total: list.length, list: list.map(m => ({ ...m })) };
       return of(result).pipe(delay(200));
     }
-    const tempResult:any = this.http
-      .get<ApiResponse<MedicineListResult>>(this.baseUrl, { params: { userId:userId,medicineName: medicineName || '' } })
-      .pipe(map(res => res.data));
-
     
-    this.http
-      .get<ApiResponse<MedicineListResult>>(this.baseUrl, { params: { userId:userId,medicineName: medicineName || '' } })
-      .subscribe(res => {
-
-      });
-    
-    console.log("===tempResult==="+tempResult);
-    debugger
     return this.http
       .get<ApiResponse<MedicineListResult>>(this.baseUrl, { params: { userId:userId,medicineName: medicineName || '' } })
       .pipe(map(res => res.data));

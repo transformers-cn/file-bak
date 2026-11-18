@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.demo.dto.SearchMedicineRecordListDTO;
 import com.example.demo.entity.Medicine;
 import com.example.demo.dto.MedicineRecordDTO;
 import com.example.demo.mapper.MedicineMapper;
@@ -24,8 +25,13 @@ public class MedicalRecordServiceImpl
     private MedicineMapper medicineMapper;
 
     // 列表查询
-    public List<MedicineRecordDTO> listMedicineRecords(String userId,String medicineName) {
-        return medicineMapper.selectMedicineRecordList(userId,medicineName);
+    public SearchMedicineRecordListDTO listMedicineRecords(String userId,String medicineName) {
+        List<MedicineRecordDTO> tempListMedicineRecords = medicineMapper.selectMedicineRecordList(userId,medicineName);
+        int dataCount = tempListMedicineRecords.size();
+        SearchMedicineRecordListDTO searchMedicineRecordListDTO = new SearchMedicineRecordListDTO();
+        searchMedicineRecordListDTO.setList(tempListMedicineRecords);
+        searchMedicineRecordListDTO.setTotal(dataCount);
+        return searchMedicineRecordListDTO;
     }
 
     public boolean checkForSaveMedicineRecord(MedicineRecordDTO medicineRecordDTO){
