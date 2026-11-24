@@ -48,6 +48,7 @@ export class MedicineService {
   private readonly saveUrl = `${environment.apiBaseUrl}/medicalRecord/save-medical-record`;
   private readonly updateUrl = `${environment.apiBaseUrl}/medicalRecord/update-medical-record`;
   private readonly deleteUrl = `${environment.apiBaseUrl}/medicalRecord/delete-medical-record`;
+  private readonly updateMedicalRecordForPerdayUrl = `${environment.apiBaseUrl}/medicalRecord/update-medical-record-for-perday`;
 
   constructor(private http: HttpClient) {}
 
@@ -198,5 +199,15 @@ export class MedicineService {
   static codeName(codes: CodeItem[], codeId: string): string {
     const found = codes.find(c => c.codeId === codeId);
     return found ? found.codeName : codeId;
+  }
+
+    /** 更新每日服用药品数量 */
+  updateMedicalRecordForPerday(userId: string): Observable<boolean> {
+    const updateMedicalRecordForPerday: any = {
+      userId: userId
+    };
+    return this.http
+      .post<ApiResponse<boolean>>(this.updateMedicalRecordForPerdayUrl, { ...updateMedicalRecordForPerday })
+      .pipe(map(res => res.data));
   }
 }

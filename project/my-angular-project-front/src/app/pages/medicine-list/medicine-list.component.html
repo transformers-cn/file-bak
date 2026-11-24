@@ -20,8 +20,7 @@
     </div>
 
     <!-- 欢迎语 -->
-    <p class="welcome">{{ userName }} 先生/女士，以下是您的药品列表。</p>
-
+     <p class="welcome">{{ userName }} 先生/女士，以下是您的药品列表。</p>
     <!-- 列表区 -->
     <div class="card table-card">
       <table class="medicine-table">
@@ -68,7 +67,9 @@
       </table>
       <div class="loading-row" *ngIf="loading">加载中...</div>
     </div>
-
+    <div class="welcome">
+      <button class="btn btn-primary" (click)="todayIntakeConfirm(list)">今日份药品确认</button>
+    </div>
     <!-- 低库存提示（剩余数量<=1盒） -->
     <div class="alert-warning" *ngIf="lowStockList.length > 0">
       <div class="alert-title">⚠ 以下药品剩余数量不足（≤1盒），请及时购买：</div>

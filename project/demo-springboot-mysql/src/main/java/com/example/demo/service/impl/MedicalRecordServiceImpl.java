@@ -167,4 +167,33 @@ public class MedicalRecordServiceImpl
         }
         return argString;
     }
+    /**
+     * 更新每日服用药品数量
+     * @param medicineRecordDTO
+     * @return
+     */
+    public boolean updateMedicalRecordForPerday(MedicineRecordDTO medicineRecordDTO){
+
+        LambdaQueryWrapper<Medicine> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(medicineRecordDTO != null && medicineRecordDTO.getUserId() != null, Medicine::getUserId, medicineRecordDTO.getUserId());
+
+        List<Medicine> medicineList = medicineMapper.selectList(queryWrapper);
+
+        for(Medicine medicine:medicineList){
+            // TODO:需要判断剩余数量够不够一天的服用量,根据剩余数量更新盒数
+            // private Integer remaining_quantity;'新增（剩余）数量（盒）
+            // private Integer tablets_per_box; '单盒药品数量（片）'
+            int remaining_quantity = medicine.getRemainingQuantity();
+            int tablets_per_box = medicine.getTabletsPerBox();
+            // private Integer daily_times;   '每日吃药次数'
+            // private Integer tablets_per_time; '每次吃药数量（片）'
+            int daily_times = medicine.getDailyTimes();
+            int tablets_per_time = medicine.getTabletsPerTime();
+            // tablets_count_all INT NOT NULL DEFAULT 0 COMMENT '总剩余数量（片/粒）'
+            int tablets_count_all = remaining_quantity*tablets_per_box - daily_times*tablets_per_time;
+            medicine.setTabletsCountAll(tablets_count_all);
+        }
+
+        return saveOrUpdateBatch(medicineList);
+    }
 }

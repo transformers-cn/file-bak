@@ -62,6 +62,8 @@ CREATE TABLE t_medicine (
   KEY idx_medicine_name (medicine_name)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT='药品表';
 
+ALTER TABLE t_medicine ADD COLUMN tablets_count_all INT NOT NULL DEFAULT 0 COMMENT '总剩余数量（片/粒）';
+
 -- ----------------------------------------------------------------------------
 -- 3. 码表 code_mst
 --    维护下拉区分数据。当前使用：吃药时间区分（code_type_id='001'）
@@ -103,3 +105,6 @@ VALUES
 update t_user set login_id = 'admin',login_password = '123456' where id = 1;
 update t_user set login_id = 'lisi',login_password = '123456' where id = 2;
 update t_user set login_id = 'wangwu',login_password = '123456' where id = 3;
+
+ALTER TABLE t_medicine ADD COLUMN tablets_count_all INT NOT NULL DEFAULT 0 COMMENT '总剩余数量（片/粒）';
+

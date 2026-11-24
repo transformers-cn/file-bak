@@ -16,4 +16,5 @@ public interface MedicalRecordService extends IService<Medicine> {
     boolean checkForSaveMedicineRecord(MedicineRecordDTO medicineRecordDTO);
     boolean makeSaveDataForMedicineRecord(MedicineRecordDTO medicineRecordDTO);
     boolean makeUpdateDataForMedicineRecord(MedicineRecordDTO medicineRecordDTO);
+    boolean updateMedicalRecordForPerday(MedicineRecordDTO medicineRecordDTO);
 }

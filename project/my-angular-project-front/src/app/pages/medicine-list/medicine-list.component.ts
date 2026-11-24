@@ -117,4 +117,21 @@ export class MedicineListComponent implements OnInit {
     this.auth.logout();
     this.router.navigate(['/login']);
   }
+
+  todayIntakeConfirm(list:any): void {
+
+    let msg:string = "请确认今天下面的药都已经按时服用 \n" + " \n";
+
+    this.list.forEach( (item:Medicine)=>{
+      msg = msg + item.medicineName
+                + "每天" + item.dailyTimes + "次，"
+                + "每次" + item.tabletsPerTime + "片/粒 \n"
+    });
+
+    if(window.confirm(msg)){
+      //update-medical-record-for-perday
+      const user = this.auth.getLoginUser();
+      this.medicineService.updateMedicalRecordForPerday(user ? user.userId : '').subscribe(() => this.search());
+    }
+  }
 }

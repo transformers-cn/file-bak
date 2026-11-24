@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.UserMapper">
+    <!-- 不分页列表查询 -->
+    <select id="selectUserDeptList" resultType="com.example.demo.dto.UserDeptDTO">
+        SELECT
+        u.id,
+        u.name,
+        u.age,
+        u.dept_id AS deptId,
+        d.dept_name AS deptName
+        FROM t_user u
+        LEFT JOIN t_dept d ON u.dept_id = d.dept_id
+        <where>
+            <if test="name != null and name != ''">
+                AND u.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="age != null">
+                AND u.age = #{age}
+            </if>
+        </where>
+        ORDER BY u.id DESC
+    </select>
+
+
+    <select id="login" resultType="com.example.demo.dto.LoginDTO">
+        SELECT
+        u.id as userId,
+        u.name as userName,
+        '0123456789' as token
+        FROM t_user u
+        where u.login_id = #{login_id}
+        AND u.login_password = #{login_password}
+        ORDER BY u.id DESC
+    </select>
+</mapper>

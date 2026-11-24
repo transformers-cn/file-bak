@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public class Medicine {
     @TableField("user_id")
     private String userId;             // VARCHAR(20)  NOT NULL           COMMENT '用户ID（主键1）',
+    @TableId(type = IdType.AUTO)
     @TableField("medicine_id")
     private String medicineId;         // VARCHAR(20)  NOT NULL           COMMENT '药品ID（主键2）',
     @TableField("medicine_name")
@@ -36,6 +37,8 @@ public class Medicine {
     private Integer dailyTimes;         // INT          NOT NULL           COMMENT '每日吃药次数',
     @TableField("tablets_per_time")
     private Integer tabletsPerTime;    // INT          NOT NULL           COMMENT '每次吃药数量（片）',
+    @TableField("tablets_count_all")
+    private Integer tabletsCountAll;    //tablets_count_all INT NOT NULL DEFAULT 0 COMMENT '总剩余数量（片/粒）'
     @TableField("remark")
     private String remark;              // VARCHAR(200)     NULL           COMMENT '备注注意事项',
     @TableField("del_flag")

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.MedicineMapper">
+    <!-- 不分页列表查询 -->
+    <select id="selectMedicineRecordList" resultType="com.example.demo.dto.MedicineRecordDTO">
+        select
+        tm.user_id as userId
+        ,tm.medicine_id as medicineId
+        ,tm.medicine_name as medicineName
+        ,tm.manufacturer as manufacturer
+        ,tm.production_date as productionDate
+        ,tm.shelf_life_months as shelfLifeMonths
+        ,tm.expiry_date as expiryDate
+        ,tm.remaining_quantity as remainingQuantity
+        ,tm.tablets_per_box as tabletsPerBox
+        ,tm.intake_time_code as intakeTimeCode
+        ,tcm.code_name as intakeTimeCodeName
+        ,tm.daily_times as dailyTimes
+        ,tm.tablets_per_time as tabletsPerTime
+        ,tm.remark as remark
+        from t_medicine tm
+        left join t_code_mst tcm
+        on tcm.code_type_id = '001'
+        and tcm.code_id = tm.intake_time_code
+        where
+            tm.user_id = #{userId}
+            <if test="medicineName != null and medicineName != ''">
+                AND medicine_name LIKE CONCAT('%', #{medicineName}, '%')
+            </if>
+        ORDER BY medicine_id DESC
+    </select>
+    <select id="getMaxMedicineId" resultType="java.lang.String">
+        select MAX(medicine_id) as maxMedicineId from t_medicine where user_id = '1'
+    </select>
+</mapper>

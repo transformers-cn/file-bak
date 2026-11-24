@@ -114,6 +114,11 @@ public class MedicalRecordController {
             return Result.ok(medicalRecordService.makeUpdateDataForMedicineRecord(medicineRecordDTO));
         }
         return Result.fail("update data error!");
-//        return Result.ok();
+    }
+
+    /** 更新每日服用药品数量：POST */
+    @PostMapping("/update-medical-record-for-perday")
+    public Result<Boolean> updateMedicalRecordForPerday(@RequestBody MedicineRecordDTO medicineRecordDTO) {
+        return Result.ok(medicalRecordService.updateMedicalRecordForPerday(medicineRecordDTO));
     }
 }
