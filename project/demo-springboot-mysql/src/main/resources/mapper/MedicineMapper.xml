@@ -19,6 +19,7 @@
         ,tcm.code_name as intakeTimeCodeName
         ,tm.daily_times as dailyTimes
         ,tm.tablets_per_time as tabletsPerTime
+        ,tm.tablets_Count_All as tabletsCountAll
         ,tm.remark as remark
         from t_medicine tm
         left join t_code_mst tcm

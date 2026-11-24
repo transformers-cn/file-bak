@@ -32,7 +32,9 @@ export interface Medicine {
   intakeTimeCode: string;
   /** 每日吃药次数 */
   dailyTimes: number;
-  /** 每次吃药数量（片） */
+  /** 总数量（片） */
+  tabletsCountAll: number;
+    /** 每次吃药数量（片） */
   tabletsPerTime: number;
   /** 备注注意事项 */
   remark: string;

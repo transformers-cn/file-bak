@@ -93,3 +93,9 @@ body {
   font-size: 12px;
   margin-top: 4px;
 }
+
+.field-error-for-list-page {
+  color: var(--danger);
+  font-size: 20px;
+  margin-top: 4px;
+}

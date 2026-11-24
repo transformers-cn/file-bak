@@ -17,6 +17,7 @@ public class MedicineRecordDTO {
     private String intakeTimeCodeName;
     private String dailyTimes;  // : 1,
     private String tabletsPerTime;  // : 1,
+    private String tabletsCountAll;
     private String remark;  // : ""
     private String addOrUpdateFlag;// 0:add(insert),1:update
 }

@@ -11,7 +11,7 @@ import {
   MedicineListResult,
   MedicineSaveRequest
 } from '../models/api.models';
-import { MockDb } from './mock-db';
+// import { MockDb } from './mock-db';
 
 /**
  * 失效日期计算：生产日期 + 保质期（月）
@@ -54,13 +54,13 @@ export class MedicineService {
 
   /** 药品检索：按药品名称模糊查询 */
   search(userId: string,medicineName: string): Observable<MedicineListResult> {
-    if (environment.useMock) {
-      const list = MockDb.medicines.filter(
-        m => !medicineName || m.medicineName.indexOf(medicineName) !== -1
-      );
-      const result: MedicineListResult = { total: list.length, list: list.map(m => ({ ...m })) };
-      return of(result).pipe(delay(200));
-    }
+    // if (environment.useMock) {
+    //   const list = MockDb.medicines.filter(
+    //     m => !medicineName || m.medicineName.indexOf(medicineName) !== -1
+    //   );
+    //   const result: MedicineListResult = { total: list.length, list: list.map(m => ({ ...m })) };
+    //   return of(result).pipe(delay(200));
+    // }
     
     return this.http
       .get<ApiResponse<MedicineListResult>>(this.baseUrl, { params: { userId:userId,medicineName: medicineName || '' } })
@@ -69,29 +69,29 @@ export class MedicineService {
 
   /** 新增药品 */
   create(req: MedicineSaveRequest, userId: string): Observable<Medicine> {
-    if (environment.useMock) {
-      const medicine: Medicine = {
-        userId,
-        medicineId: MockDb.nextMedicineId(),
-        medicineName: req.medicineName,
-        manufacturer: req.manufacturer,
-        productionDate: req.productionDate,
-        shelfLifeMonths: req.shelfLifeMonths,
-        expiryDate: calcExpiryDate(req.productionDate, req.shelfLifeMonths),
-        remainingQuantity: req.addQuantity,
-        tabletsPerBox: req.tabletsPerBox,
-        intakeTimeCode: req.intakeTimeCode,
-        dailyTimes: req.dailyTimes,
-        tabletsPerTime: req.tabletsPerTime,
-        remark: req.remark
-      };
-      MockDb.medicines.push(medicine);
-      return of({ ...medicine }).pipe(delay(200));
-    }
+    // if (environment.useMock) {
+    //   const medicine: Medicine = {
+    //     userId,
+    //     medicineId: MockDb.nextMedicineId(),
+    //     medicineName: req.medicineName,
+    //     manufacturer: req.manufacturer,
+    //     productionDate: req.productionDate,
+    //     shelfLifeMonths: req.shelfLifeMonths,
+    //     expiryDate: calcExpiryDate(req.productionDate, req.shelfLifeMonths),
+    //     remainingQuantity: req.addQuantity,
+    //     tabletsPerBox: req.tabletsPerBox,
+    //     intakeTimeCode: req.intakeTimeCode,
+    //     dailyTimes: req.dailyTimes,
+    //     tabletsPerTime: req.tabletsPerTime,
+    //     remark: req.remark
+    //   };
+    //   MockDb.medicines.push(medicine);
+    //   return of({ ...medicine }).pipe(delay(200));
+    // }
 
     const medicine: Medicine = {
       userId,
-      medicineId: MockDb.nextMedicineId(),
+      medicineId: '',
       medicineName: req.medicineName,
       manufacturer: req.manufacturer,
       productionDate: req.productionDate,
@@ -102,6 +102,7 @@ export class MedicineService {
       intakeTimeCode: req.intakeTimeCode,
       dailyTimes: req.dailyTimes,
       tabletsPerTime: req.tabletsPerTime,
+      tabletsCountAll: 0,
       remark: req.remark
     };
 
@@ -141,13 +142,13 @@ export class MedicineService {
     //   .put<ApiResponse<Medicine>>(`${this.baseUrl}/${medicineId}`, req)
     //   .pipe(map(res => res.data));
     debugger
-    const idx = MockDb.medicines.findIndex(m => m.medicineId === medicineId);
-    if (idx === -1) {
-      return throwError('药品不存在');
-    }
-    const old = MockDb.medicines[idx];
+    // const idx = MockDb.medicines.findIndex(m => m.medicineId === medicineId);
+    // if (idx === -1) {
+    //   return throwError('药品不存在');
+    // }
+    // const old = MockDb.medicines[idx];
     const updated: Medicine = {
-        ...old,
+        // ...old,
         userId: userId,
         medicineId: medicineId,
         medicineName: req.medicineName,
@@ -155,11 +156,12 @@ export class MedicineService {
         productionDate: req.productionDate,
         shelfLifeMonths: req.shelfLifeMonths,
         expiryDate: calcExpiryDate(req.productionDate, req.shelfLifeMonths),
-        remainingQuantity: old.remainingQuantity + req.addQuantity,
+        remainingQuantity: req.addQuantity,
         tabletsPerBox: req.tabletsPerBox,
         intakeTimeCode: req.intakeTimeCode,
         dailyTimes: req.dailyTimes,
         tabletsPerTime: req.tabletsPerTime,
+        tabletsCountAll: 0,
         remark: req.remark
       };
     return this.http
@@ -169,13 +171,13 @@ export class MedicineService {
 
   /** 删除药品 */
   remove(medicineId: string,userId: string): Observable<boolean> {
-    if (environment.useMock) {
-      const idx = MockDb.medicines.findIndex(m => m.medicineId === medicineId);
-      if (idx !== -1) {
-        MockDb.medicines.splice(idx, 1);
-      }
-      return of(idx !== -1).pipe(delay(200));
-    }
+    // if (environment.useMock) {
+    //   const idx = MockDb.medicines.findIndex(m => m.medicineId === medicineId);
+    //   if (idx !== -1) {
+    //     MockDb.medicines.splice(idx, 1);
+    //   }
+    //   return of(idx !== -1).pipe(delay(200));
+    // }
     const removeMedicine: any = {
       userId: userId,
       medicineId: medicineId
@@ -187,9 +189,9 @@ export class MedicineService {
 
   /** 获取吃药时间区分码表 */
   getIntakeTimeCodes(): Observable<CodeItem[]> {
-    if (environment.useMock) {
-      return of(MockDb.intakeTimeCodes.map(c => ({ ...c }))).pipe(delay(100));
-    }
+    // if (environment.useMock) {
+    //   return of(MockDb.intakeTimeCodes.map(c => ({ ...c }))).pipe(delay(100));
+    // }
     return this.http
       .get<ApiResponse<CodeItem[]>>(this.codeUrl)
       .pipe(map(res => res.data));
@@ -202,12 +204,11 @@ export class MedicineService {
   }
 
     /** 更新每日服用药品数量 */
-  updateMedicalRecordForPerday(userId: string): Observable<boolean> {
+  updateMedicalRecordForPerday(userId: string): Observable<ApiResponse<boolean>> {
     const updateMedicalRecordForPerday: any = {
       userId: userId
     };
     return this.http
-      .post<ApiResponse<boolean>>(this.updateMedicalRecordForPerdayUrl, { ...updateMedicalRecordForPerday })
-      .pipe(map(res => res.data));
-  }
+      .post<ApiResponse<boolean>>(this.updateMedicalRecordForPerdayUrl, { ...updateMedicalRecordForPerday });
+}
 }

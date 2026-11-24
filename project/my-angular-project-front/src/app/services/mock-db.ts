@@ -28,6 +28,7 @@ export class MockDb {
       intakeTimeCode: '002',
       dailyTimes: 1,
       tabletsPerTime: 1,
+      tabletsCountAll:21,
       remark: ''
     },
     {
@@ -43,6 +44,7 @@ export class MockDb {
       intakeTimeCode: '003',
       dailyTimes: 3,
       tabletsPerTime: 2,
+      tabletsCountAll:10,
       remark: ''
     }
   ];

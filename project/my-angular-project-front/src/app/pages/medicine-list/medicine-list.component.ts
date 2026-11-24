@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { CodeItem, Medicine } from '../../models/api.models';
 import { AuthService } from '../../services/auth.service';
 import { MedicineService } from '../../services/medicine.service';
-
+import { Observable, of, throwError } from 'rxjs';
 @Component({
   selector: 'app-medicine-list',
   templateUrl: './medicine-list.component.html',
@@ -18,6 +18,8 @@ export class MedicineListComponent implements OnInit {
   list: Medicine[] = [];
   intakeTimeCodes: CodeItem[] = [];
   loading = false;
+
+  errorMsg = '';
 
   modalVisible = false;
   editingMedicine: Medicine | null = null;
@@ -34,6 +36,7 @@ export class MedicineListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.errorMsg = '';
     const user = this.auth.getLoginUser();
     this.userId = user ? user.userId : '';
     if (!user) {
@@ -59,34 +62,40 @@ export class MedicineListComponent implements OnInit {
 
   /** 重置检索条件并重新查询 */
   reset(): void {
+    this.errorMsg = '';
     this.searchKeyword = '';
     this.search();
   }
 
   /** 打开新增 POP */
   openCreate(): void {
+    this.errorMsg = '';
     this.editingMedicine = null;
     this.modalVisible = true;
   }
 
   /** 打开编辑 POP */
   openEdit(item: Medicine): void {
+    this.errorMsg = '';
     this.editingMedicine = item;
     this.modalVisible = true;
   }
 
   closeModal(): void {
+    this.errorMsg = '';
     this.modalVisible = false;
     this.editingMedicine = null;
   }
 
   onSaved(): void {
+    this.errorMsg = '';
     this.closeModal();
     this.search();
   }
 
   /** 删除：先提示确认，再从列表删除 */
   confirmDelete(item: Medicine): void {
+    this.errorMsg = '';
     if (window.confirm(`确定要删除药品「${item.medicineName}」吗？`)) {
       const user = this.auth.getLoginUser();
       this.medicineService.remove(item.medicineId, user ? user.userId : '').subscribe(() => this.search());
@@ -119,7 +128,7 @@ export class MedicineListComponent implements OnInit {
   }
 
   todayIntakeConfirm(list:any): void {
-
+  
     let msg:string = "请确认今天下面的药都已经按时服用 \n" + " \n";
 
     this.list.forEach( (item:Medicine)=>{
@@ -129,9 +138,19 @@ export class MedicineListComponent implements OnInit {
     });
 
     if(window.confirm(msg)){
-      //update-medical-record-for-perday
       const user = this.auth.getLoginUser();
-      this.medicineService.updateMedicalRecordForPerday(user ? user.userId : '').subscribe(() => this.search());
+      const userId = user ? user.userId : '';
+    
+      this.medicineService.updateMedicalRecordForPerday(userId).subscribe(
+        res => {
+          this.errorMsg = '';
+          if(res.code===-1){
+            this.errorMsg = res.message;
+          }
+          // 正常处理数据
+          this.search();
+        }
+      )
     }
   }
 }

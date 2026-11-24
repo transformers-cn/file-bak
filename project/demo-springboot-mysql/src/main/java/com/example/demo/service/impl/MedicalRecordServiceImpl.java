@@ -78,6 +78,13 @@ public class MedicalRecordServiceImpl
         medicine.setTabletsPerTime(Integer.parseInt(medicineRecordDTO.getTabletsPerTime()));
 //        private String remark;     '备注注意事项',
         medicine.setRemark(medicineRecordDTO.getRemark());
+
+        // 新增（剩余）数量（盒）
+        int count_boxs = Integer.parseInt(medicineRecordDTO.getRemainingQuantity());
+        // 单盒药品数量（片）
+        int count_tables =  Integer.parseInt(medicineRecordDTO.getTabletsPerBox());
+        // tablets_count_all INT NOT NULL DEFAULT 0 COMMENT '总剩余数量（片/粒）';
+        medicine.setTabletsCountAll(count_boxs*count_tables);
 //        private Integer del_flag;    '删除标志：0-正常 1-已删除',
         medicine.setDelFlag(0);
 //        private String create_user;  '创建人',
@@ -104,6 +111,7 @@ public class MedicalRecordServiceImpl
 
         Medicine medicine = medicineMapper.selectOne(queryWrapper);
         int inputQuantity = StringUtils.isEmpty(medicineRecordDTO.getRemainingQuantity())?0:Integer.parseInt(medicineRecordDTO.getRemainingQuantity());
+        int DBQuantity = medicine.getRemainingQuantity();
 //        private String medicine_name;'药品名称',
         medicine.setMedicineName(medicineRecordDTO.getMedicineName());
 //        private String manufacturer;  '生产厂家',
@@ -115,7 +123,7 @@ public class MedicalRecordServiceImpl
 //        private LocalDate expiry_date;  '失效日期（=生产日期+保质期，计算生成）',editStringToLocalDate(medicineRecordDTO.getExpiryDate())
         medicine.setExpiryDate(editStringToLocalDate(medicineRecordDTO.getExpiryDate()));
 //        private Integer remaining_quantity;'新增（剩余）数量（盒），<=1 时画面提示购买',
-        medicine.setRemainingQuantity(inputQuantity);
+        medicine.setRemainingQuantity(inputQuantity+DBQuantity);
 //        private Integer tablets_per_box; '单盒药品数量（片）',
         medicine.setTabletsPerBox(Integer.parseInt(medicineRecordDTO.getTabletsPerBox()));
 //        private String intake_time_code; '吃药时间区分（码表 code_id=001 下的区分ID）',
@@ -130,6 +138,17 @@ public class MedicalRecordServiceImpl
         medicine.setUpdateUser(medicineRecordDTO.getUserId());
 //        private LocalDateTime update_time;  '更新时间',
         medicine.setUpdateTime(LocalDateTime.now());
+
+
+        // 新增（剩余）数量（盒）
+        int count_boxs = Integer.parseInt(medicineRecordDTO.getRemainingQuantity());
+        // 单盒药品数量（片）
+        int count_tables =  Integer.parseInt(medicineRecordDTO.getTabletsPerBox());
+        // DB剩余药片数量
+        int TabletsCountAllDB = medicine.getTabletsCountAll();
+
+        // tablets_count_all INT NOT NULL DEFAULT 0 COMMENT '总剩余数量（片/粒）';
+        medicine.setTabletsCountAll(count_boxs*count_tables+TabletsCountAllDB);
 
         return update(medicine,queryWrapper);
     }
@@ -167,6 +186,16 @@ public class MedicalRecordServiceImpl
         }
         return argString;
     }
+
+
+    public List<Medicine> getMedicineListByUserId(String userId){
+        LambdaQueryWrapper<Medicine> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(userId != null, Medicine::getUserId, userId);
+
+        List<Medicine> medicineList = medicineMapper.selectList(queryWrapper);
+        return medicineList;
+    }
+
     /**
      * 更新每日服用药品数量
      * @param medicineRecordDTO
@@ -174,10 +203,13 @@ public class MedicalRecordServiceImpl
      */
     public boolean updateMedicalRecordForPerday(MedicineRecordDTO medicineRecordDTO){
 
-        LambdaQueryWrapper<Medicine> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(medicineRecordDTO != null && medicineRecordDTO.getUserId() != null, Medicine::getUserId, medicineRecordDTO.getUserId());
+        String userId = (medicineRecordDTO != null) ? medicineRecordDTO.getUserId():"";
 
-        List<Medicine> medicineList = medicineMapper.selectList(queryWrapper);
+        if(StringUtils.isEmpty(userId)){
+            return false;
+        }
+
+        List<Medicine> medicineList = getMedicineListByUserId(userId);
 
         for(Medicine medicine:medicineList){
             // TODO:需要判断剩余数量够不够一天的服用量,根据剩余数量更新盒数
@@ -185,15 +217,74 @@ public class MedicalRecordServiceImpl
             // private Integer tablets_per_box; '单盒药品数量（片）'
             int remaining_quantity = medicine.getRemainingQuantity();
             int tablets_per_box = medicine.getTabletsPerBox();
+
             // private Integer daily_times;   '每日吃药次数'
             // private Integer tablets_per_time; '每次吃药数量（片）'
             int daily_times = medicine.getDailyTimes();
             int tablets_per_time = medicine.getTabletsPerTime();
+
+            int tablets_perday = daily_times*tablets_per_time;
             // tablets_count_all INT NOT NULL DEFAULT 0 COMMENT '总剩余数量（片/粒）'
-            int tablets_count_all = remaining_quantity*tablets_per_box - daily_times*tablets_per_time;
+
+            // 剩余总片数
+            int tatal_tables = medicine.getTabletsCountAll();
+
+
+            int tablets_count_all = tatal_tables - tablets_perday;
             medicine.setTabletsCountAll(tablets_count_all);
+
+            int countboxs = tablets_count_all/tablets_per_box;
+
+            medicine.setRemainingQuantity(countboxs);
+
         }
 
         return saveOrUpdateBatch(medicineList);
+    }
+
+    /**
+     * 更新每日服用药品数量Check
+     * @param medicineRecordDTO
+     * @return
+     */
+    public String updateMedicalRecordForPerdayCheck(MedicineRecordDTO medicineRecordDTO){
+
+        String message = "";
+
+        String userId = (medicineRecordDTO!=null) ? medicineRecordDTO.getUserId():"";
+
+        if(StringUtils.isEmpty(userId)){
+            return "系统错误，UserId为空，请联系管理员处理。";
+        }
+
+        List<Medicine> medicineList = getMedicineListByUserId(userId);
+
+        for(Medicine medicine:medicineList){
+            if(StringUtils.isEmpty(message)){
+                // TODO:需要判断剩余数量够不够一天的服用量,根据剩余数量更新盒数
+                // private Integer remaining_quantity;'新增（剩余）数量（盒）
+                // private Integer tablets_per_box; '单盒药品数量（片）'
+                int remaining_quantity = medicine.getRemainingQuantity();
+                int tablets_per_box = medicine.getTabletsPerBox();
+                // private Integer daily_times;   '每日吃药次数'
+                // private Integer tablets_per_time; '每次吃药数量（片）'
+                int daily_times = medicine.getDailyTimes();
+                int tablets_per_time = medicine.getTabletsPerTime();
+                int tablets_perday = daily_times*tablets_per_time;
+                // tablets_count_all INT NOT NULL DEFAULT 0 COMMENT '总剩余数量（片/粒）'
+
+                // 剩余总片数
+                int tatal_tables = medicine.getTabletsCountAll();
+
+                if(tatal_tables<tablets_perday){
+                    message =  medicine.getMedicineName()+"剩余数量不足一天的服用量，请更新药品后再确认。";
+                    break;
+                }else{
+                    message =  "";
+                }
+            }
+        }
+
+        return message;
     }
 }

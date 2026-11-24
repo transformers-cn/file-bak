@@ -32,11 +32,12 @@
             <th>生产日期</th>
             <th>保质期</th>
             <th>失效日期</th>
-            <th>剩余数量（盒）</th>
-            <th>单盒药品数量（片）</th>
+            <th>剩余数量<br/>（盒）</th>
+            <th>剩余数量<br/>（片/粒）</th>
+            <th>单盒药品数量<br/>（片/粒）</th>
             <th>吃药时间区分</th>
             <th>每日吃药次数</th>
-            <th>每次吃药数量（片）</th>
+            <th>每次吃药数量<br/>（片/粒）</th>
             <th>备注注意事项</th>
             <th class="col-op">操作</th>
           </tr>
@@ -50,10 +51,11 @@
             <td>{{ item.shelfLifeMonths / 12 | number:'1.0-0' }}年</td>
             <td [class.expiry-warning]="isExpiringSoon(item.expiryDate)">{{ item.expiryDate }}</td>
             <td [class.quantity-warning]="item.remainingQuantity <= 1">{{ item.remainingQuantity }}</td>
+            <td>{{ item.tabletsCountAll }}</td>
             <td>{{ item.tabletsPerBox }}</td>
             <td>{{ intakeTimeName(item.intakeTimeCode) }}</td>
             <td>{{ item.dailyTimes }}</td>
-            <td>{{ item.tabletsPerTime }}</td>
+            <td>{{ item.tabletsPerTime }}</td> 
             <td class="cell-remark">{{ item.remark }}</td>
             <td class="col-op">
               <button class="btn btn-link" (click)="openEdit(item)">编辑</button>
@@ -66,9 +68,10 @@
         </tbody>
       </table>
       <div class="loading-row" *ngIf="loading">加载中...</div>
+      <div class="field-error-for-list-page" *ngIf="errorMsg">{{ errorMsg }}</div>
     </div>
     <div class="welcome">
-      <button class="btn btn-primary" (click)="todayIntakeConfirm(list)">今日份药品确认</button>
+      <button class="btn btn-primary" (click)="todayIntakeConfirm(userId)">今日份药品确认</button>
     </div>
     <!-- 低库存提示（剩余数量<=1盒） -->
     <div class="alert-warning" *ngIf="lowStockList.length > 0">

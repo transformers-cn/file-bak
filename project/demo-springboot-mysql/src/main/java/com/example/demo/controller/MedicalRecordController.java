@@ -9,6 +9,7 @@ import com.example.demo.dto.MedicineRecordDTO;
 import com.example.demo.dto.SearchMedicineRecordListDTO;
 import com.example.demo.entity.Medicine;
 import com.example.demo.service.MedicalRecordService;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -119,6 +120,11 @@ public class MedicalRecordController {
     /** 更新每日服用药品数量：POST */
     @PostMapping("/update-medical-record-for-perday")
     public Result<Boolean> updateMedicalRecordForPerday(@RequestBody MedicineRecordDTO medicineRecordDTO) {
-        return Result.ok(medicalRecordService.updateMedicalRecordForPerday(medicineRecordDTO));
+        String returnValue = medicalRecordService.updateMedicalRecordForPerdayCheck(medicineRecordDTO);
+        if(!StringUtils.isEmpty(returnValue)){
+            return Result.fail(returnValue);
+        }else{
+            return Result.ok(medicalRecordService.updateMedicalRecordForPerday(medicineRecordDTO));
+        }
     }
 }
