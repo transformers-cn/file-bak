@@ -45,6 +45,7 @@ export class MedicineService {
 
   private readonly baseUrl = `${environment.apiBaseUrl}/medicalRecord/search-medical-record`;
   private readonly codeUrl = `${environment.apiBaseUrl}/common/codes/intake-time`;
+  private readonly codeSearchByIdUrl = `${environment.apiBaseUrl}/common/codes/search-by-Id`;
   private readonly saveUrl = `${environment.apiBaseUrl}/medicalRecord/save-medical-record`;
   private readonly updateUrl = `${environment.apiBaseUrl}/medicalRecord/update-medical-record`;
   private readonly deleteUrl = `${environment.apiBaseUrl}/medicalRecord/delete-medical-record`;
@@ -100,6 +101,7 @@ export class MedicineService {
       remainingQuantity: req.addQuantity,
       tabletsPerBox: req.tabletsPerBox,
       intakeTimeCode: req.intakeTimeCode,
+      intakeFlgCode: req.intakeFlgCode,
       dailyTimes: req.dailyTimes,
       tabletsPerTime: req.tabletsPerTime,
       tabletsCountAll: 0,
@@ -159,6 +161,7 @@ export class MedicineService {
         remainingQuantity: req.addQuantity,
         tabletsPerBox: req.tabletsPerBox,
         intakeTimeCode: req.intakeTimeCode,
+        intakeFlgCode: req.intakeFlgCode,
         dailyTimes: req.dailyTimes,
         tabletsPerTime: req.tabletsPerTime,
         tabletsCountAll: 0,
@@ -192,8 +195,17 @@ export class MedicineService {
     // if (environment.useMock) {
     //   return of(MockDb.intakeTimeCodes.map(c => ({ ...c }))).pipe(delay(100));
     // }
+    // return this.http
+    //   .get<ApiResponse<CodeItem[]>>(this.codeUrl)
+    //   .pipe(map(res => res.data));
+
     return this.http
-      .get<ApiResponse<CodeItem[]>>(this.codeUrl)
+      .get<ApiResponse<CodeItem[]>>(this.codeSearchByIdUrl , { params: { codeTypeId:'001' } })
+      .pipe(map(res => res.data));
+  }
+  getIntakeFlgCodes(): Observable<CodeItem[]> { 
+    return this.http
+      .get<ApiResponse<CodeItem[]>>(this.codeSearchByIdUrl , { params: { codeTypeId:'002' } })
       .pipe(map(res => res.data));
   }
 
@@ -210,5 +222,5 @@ export class MedicineService {
     };
     return this.http
       .post<ApiResponse<boolean>>(this.updateMedicalRecordForPerdayUrl, { ...updateMedicalRecordForPerday });
-}
+  }
 }

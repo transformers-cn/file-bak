@@ -52,6 +52,15 @@
           <label class="required">每次吃药数量（片）</label>
           <input class="form-control" type="number" min="1" [(ngModel)]="form.tabletsPerTime" />
         </div>
+        <div class="form-item">
+          <label class="required">是否继续服用</label>
+          <select class="form-control"  [(ngModel)]="form.intakeFlgCode">
+            <option value="">请选择</option>
+            <option *ngFor="let code of intakeFlgCodes" [value]="code.codeId">
+              {{ code.codeName }}
+            </option>
+          </select>
+        </div>
         <div class="form-item form-item-full">
           <label>备注注意事项</label>
           <textarea class="form-control" rows="2" maxlength="200" [(ngModel)]="form.remark"></textarea>

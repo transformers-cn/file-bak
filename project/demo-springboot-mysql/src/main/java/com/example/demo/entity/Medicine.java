@@ -33,6 +33,8 @@ public class Medicine {
     private Integer tabletsPerBox;     // INT          NOT NULL           COMMENT '单盒药品数量（片）',
     @TableField("intake_time_code")
     private String intakeTimeCode;    // VARCHAR(3)   NOT NULL           COMMENT '吃药时间区分（码表 code_id=001 下的区分ID）',
+    @TableField("intake_flg_code")
+    private String intakeFlgCode;
     @TableField("daily_times")
     private Integer dailyTimes;         // INT          NOT NULL           COMMENT '每日吃药次数',
     @TableField("tablets_per_time")

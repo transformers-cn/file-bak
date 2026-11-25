@@ -17,6 +17,7 @@ export class MedicineListComponent implements OnInit {
   searchKeyword = '';
   list: Medicine[] = [];
   intakeTimeCodes: CodeItem[] = [];
+  intakeFlgCodes: CodeItem[] = [];
   loading = false;
 
   errorMsg = '';
@@ -46,6 +47,9 @@ export class MedicineListComponent implements OnInit {
     this.userName = user.userName;
     this.medicineService.getIntakeTimeCodes().subscribe(codes => {
       this.intakeTimeCodes = codes;
+    });
+    this.medicineService.getIntakeFlgCodes().subscribe(codes => {
+      this.intakeFlgCodes = codes;
     });
     this.search();
   }
@@ -113,6 +117,10 @@ export class MedicineListComponent implements OnInit {
     return MedicineService.codeName(this.intakeTimeCodes, code);
   }
 
+  intakeFlgCodesName(code: string): string {
+    return MedicineService.codeName(this.intakeFlgCodes, code);
+  }
+
   /** 失效日期距今不足阈值天数 */
   isExpiringSoon(expiryDate: string): boolean {
     if (!expiryDate) {
@@ -132,9 +140,11 @@ export class MedicineListComponent implements OnInit {
     let msg:string = "请确认今天下面的药都已经按时服用 \n" + " \n";
 
     this.list.forEach( (item:Medicine)=>{
-      msg = msg + item.medicineName
+      if(item.intakeFlgCode==='001'){
+        msg = msg + item.medicineName
                 + "每天" + item.dailyTimes + "次，"
                 + "每次" + item.tabletsPerTime + "片/粒 \n"
+      }
     });
 
     if(window.confirm(msg)){

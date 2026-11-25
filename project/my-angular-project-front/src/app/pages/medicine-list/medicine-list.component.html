@@ -29,15 +29,16 @@
             <th>No</th>
             <th>药品名称</th>
             <th>生产厂家</th>
+            <th>继续服用</th>
             <th>生产日期</th>
             <th>保质期</th>
             <th>失效日期</th>
             <th>剩余数量<br/>（盒）</th>
             <th>剩余数量<br/>（片/粒）</th>
-            <th>单盒药品数量<br/>（片/粒）</th>
-            <th>吃药时间区分</th>
-            <th>每日吃药次数</th>
-            <th>每次吃药数量<br/>（片/粒）</th>
+            <th>单盒数量<br/>（片/粒）</th>
+            <th>吃药时间</th>
+            <th>服用次数<br/>（每日）</th>
+            <th>服用数量<br/>（片/粒）</th>
             <th>备注注意事项</th>
             <th class="col-op">操作</th>
           </tr>
@@ -47,6 +48,7 @@
             <td>{{ i + 1 }}</td>
             <td>{{ item.medicineName }}</td>
             <td>{{ item.manufacturer }}</td>
+            <td>{{ intakeFlgCodesName(item.intakeFlgCode) }}</td>
             <td>{{ item.productionDate }}</td>
             <td>{{ item.shelfLifeMonths / 12 | number:'1.0-0' }}年</td>
             <td [class.expiry-warning]="isExpiringSoon(item.expiryDate)">{{ item.expiryDate }}</td>
@@ -87,6 +89,7 @@
     *ngIf="modalVisible"
     [medicine]="editingMedicine"
     [intakeTimeCodes]="intakeTimeCodes"
+    [intakeFlgCodes]="intakeFlgCodes"
     (saved)="onSaved()"
     (closed)="closeModal()">
   </app-medicine-form-modal>

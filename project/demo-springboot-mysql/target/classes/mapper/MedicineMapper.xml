@@ -16,7 +16,9 @@
         ,tm.remaining_quantity as remainingQuantity
         ,tm.tablets_per_box as tabletsPerBox
         ,tm.intake_time_code as intakeTimeCode
+        ,tm.intake_flg_code as intakeFlgCode
         ,tcm.code_name as intakeTimeCodeName
+        ,tcm2.code_name as intakeFlgCodeName
         ,tm.daily_times as dailyTimes
         ,tm.tablets_per_time as tabletsPerTime
         ,tm.tablets_Count_All as tabletsCountAll
@@ -25,6 +27,9 @@
         left join t_code_mst tcm
         on tcm.code_type_id = '001'
         and tcm.code_id = tm.intake_time_code
+        left join t_code_mst tcm2
+        on tcm2.code_type_id = '002'
+        and tcm2.code_id = tm.intake_flg_code
         where
             tm.user_id = #{userId}
             <if test="medicineName != null and medicineName != ''">

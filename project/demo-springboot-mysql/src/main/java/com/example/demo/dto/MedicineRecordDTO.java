@@ -15,6 +15,8 @@ public class MedicineRecordDTO {
     private String tabletsPerBox;  // : 7,
     private String intakeTimeCode;  // : "002",
     private String intakeTimeCodeName;
+    private String intakeFlgCode;  // : "002",
+    private String intakeFlgCodeName;
     private String dailyTimes;  // : 1,
     private String tabletsPerTime;  // : 1,
     private String tabletsCountAll;

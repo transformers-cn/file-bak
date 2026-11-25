@@ -72,6 +72,7 @@ public class MedicalRecordServiceImpl
         medicine.setTabletsPerBox(Integer.parseInt(medicineRecordDTO.getTabletsPerBox()));
 //        private String intake_time_code; '吃药时间区分（码表 code_id=001 下的区分ID）',
         medicine.setIntakeTimeCode(medicineRecordDTO.getIntakeTimeCode());
+        medicine.setIntakeFlgCode(medicineRecordDTO.getIntakeFlgCode());
 //        private Integer daily_times;   '每日吃药次数',
         medicine.setDailyTimes(Integer.parseInt(medicineRecordDTO.getDailyTimes()));
 //        private Integer tablets_per_time; '每次吃药数量（片）',
@@ -128,6 +129,7 @@ public class MedicalRecordServiceImpl
         medicine.setTabletsPerBox(Integer.parseInt(medicineRecordDTO.getTabletsPerBox()));
 //        private String intake_time_code; '吃药时间区分（码表 code_id=001 下的区分ID）',
         medicine.setIntakeTimeCode(medicineRecordDTO.getIntakeTimeCode());
+        medicine.setIntakeFlgCode(medicineRecordDTO.getIntakeFlgCode());
 //        private Integer daily_times;   '每日吃药次数',
         medicine.setDailyTimes(Integer.parseInt(medicineRecordDTO.getDailyTimes()));
 //        private Integer tablets_per_time; '每次吃药数量（片）',
@@ -189,8 +191,19 @@ public class MedicalRecordServiceImpl
 
 
     public List<Medicine> getMedicineListByUserId(String userId){
+
         LambdaQueryWrapper<Medicine> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(userId != null, Medicine::getUserId, userId);
+
+        List<Medicine> medicineList = medicineMapper.selectList(queryWrapper);
+
+        return medicineList;
+    }
+
+    public List<Medicine> getMedicineListByUserIdForIntakeing(String userId){
+        LambdaQueryWrapper<Medicine> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(userId != null, Medicine::getUserId, userId);
+        queryWrapper.eq( Medicine::getIntakeFlgCode, "001");
 
         List<Medicine> medicineList = medicineMapper.selectList(queryWrapper);
         return medicineList;
@@ -209,7 +222,7 @@ public class MedicalRecordServiceImpl
             return false;
         }
 
-        List<Medicine> medicineList = getMedicineListByUserId(userId);
+        List<Medicine> medicineList = getMedicineListByUserIdForIntakeing(userId);
 
         for(Medicine medicine:medicineList){
             // TODO:需要判断剩余数量够不够一天的服用量,根据剩余数量更新盒数
@@ -257,7 +270,7 @@ public class MedicalRecordServiceImpl
             return "系统错误，UserId为空，请联系管理员处理。";
         }
 
-        List<Medicine> medicineList = getMedicineListByUserId(userId);
+        List<Medicine> medicineList = getMedicineListByUserIdForIntakeing(userId);
 
         for(Medicine medicine:medicineList){
             if(StringUtils.isEmpty(message)){

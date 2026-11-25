@@ -30,4 +30,11 @@ public class CommonController {
 
         return Result.ok(codeMstService.list(queryWrapper));
     }
+
+    @GetMapping ("/codes/search-by-Id")
+    public Result<List<CodeMst>> searchCodeMstById(String codeTypeId) {
+        LambdaQueryWrapper<CodeMst> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CodeMst::getCodeTypeId, codeTypeId);
+        return Result.ok(codeMstService.list(queryWrapper));
+    }
 }

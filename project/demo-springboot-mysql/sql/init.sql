@@ -90,6 +90,9 @@ INSERT INTO t_code_mst (code_type_id, code_id, display_order, code_name) VALUES
   ('001', '001', 1, '餐前'),
   ('001', '002', 2, '随餐'),
   ('001', '003', 3, '餐后');
+INSERT INTO t_code_mst (code_type_id, code_id, display_order, code_name) VALUES
+  ('002', '001', 1, '是'),
+  ('002', '002', 2, '否');
 
 
 -- 示例药品数据（与设计文档画面示例一致）
@@ -107,4 +110,7 @@ update t_user set login_id = 'lisi',login_password = '123456' where id = 2;
 update t_user set login_id = 'wangwu',login_password = '123456' where id = 3;
 
 ALTER TABLE t_medicine ADD COLUMN tablets_count_all INT NOT NULL DEFAULT 0 COMMENT '总剩余数量（片/粒）';
+
+ALTER TABLE t_medicine ADD COLUMN intake_flg_code VARCHAR(3)   NOT NULL  COMMENT '是否继续服用区分（码表 code_id=002 下的区分ID）';
+update t_medicine set intake_flg_code = '001';
 

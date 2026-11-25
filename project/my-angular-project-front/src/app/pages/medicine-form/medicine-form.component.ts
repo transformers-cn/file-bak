@@ -17,6 +17,7 @@ export class MedicineFormComponent implements OnInit {
 
   @Input() medicine: Medicine | null = null;
   @Input() intakeTimeCodes: CodeItem[] = [];
+  @Input() intakeFlgCodes: CodeItem[] = [];
   @Output() saved = new EventEmitter<void>();
   @Output() closed = new EventEmitter<void>();
 
@@ -46,6 +47,7 @@ export class MedicineFormComponent implements OnInit {
         addQuantity: 0,
         tabletsPerBox: m.tabletsPerBox,
         intakeTimeCode: m.intakeTimeCode,
+        intakeFlgCode: m.intakeFlgCode,
         dailyTimes: m.dailyTimes,
         tabletsPerTime: m.tabletsPerTime,
         remark: m.remark
@@ -68,11 +70,15 @@ export class MedicineFormComponent implements OnInit {
     } else if (!f.shelfLifeMonths || f.shelfLifeMonths <= 0) {
       this.errorMsg = '请输入有效的保质期';
     } else if (f.addQuantity == null || f.addQuantity < 0) {
-      this.errorMsg = '请输入有效的新增数量';
+      if(f.intakeFlgCode && f.intakeFlgCode === '001'){
+        this.errorMsg = '请输入有效的新增数量';
+      }
     } else if (!f.tabletsPerBox || f.tabletsPerBox <= 0) {
       this.errorMsg = '请输入有效的单盒药品数量';
     } else if (!f.intakeTimeCode) {
       this.errorMsg = '请选择吃药时间区分';
+    }  else if (!f.intakeFlgCode) {
+      this.errorMsg = '请选择是否继续服用区分';
     } else if (!f.dailyTimes || f.dailyTimes <= 0) {
       this.errorMsg = '请输入有效的每日吃药次数';
     } else if (!f.tabletsPerTime || f.tabletsPerTime <= 0) {
@@ -103,6 +109,7 @@ export class MedicineFormComponent implements OnInit {
       addQuantity: 1,
       tabletsPerBox: null as any,
       intakeTimeCode: '',
+      intakeFlgCode: '',
       dailyTimes: null as any,
       tabletsPerTime: null as any,
       remark: ''

@@ -21,8 +21,8 @@ USE medicine_db;
 -- 1. 用户表 user_mst
 --    登录画面使用；user_id 同时作为药品表的用户维度主键
 -- ----------------------------------------------------------------------------
-DROP TABLE IF EXISTS user_mst;
-CREATE TABLE user_mst (
+DROP TABLE IF EXISTS t_user_mst;
+CREATE TABLE t_user_mst (
   user_id       VARCHAR(20)  NOT NULL                COMMENT '用户ID（主键）',
   user_name     VARCHAR(50)  NOT NULL                COMMENT '用户姓名（列表页欢迎语使用）',
   login_id      VARCHAR(50)  NOT NULL                COMMENT '登录用户名',
@@ -40,8 +40,8 @@ CREATE TABLE user_mst (
 -- 2. 药品表 medicine
 --    主键：user_id + medicine_id（对应设计文档中的 主键1 / 主键2）
 -- ----------------------------------------------------------------------------
-DROP TABLE IF EXISTS medicine;
-CREATE TABLE medicine (
+DROP TABLE IF EXISTS t_medicine;
+CREATE TABLE t_medicine (
   user_id             VARCHAR(20)  NOT NULL           COMMENT '用户ID（主键1）',
   medicine_id         VARCHAR(20)  NOT NULL           COMMENT '药品ID（主键2）',
   medicine_name       VARCHAR(50)  NOT NULL           COMMENT '药品名称',
@@ -71,8 +71,8 @@ CREATE TABLE medicine (
 --    为便于前后端传值，这里将每个选项赋予唯一 code_id（001/002/003），
 --    medicine.intake_time_code 存放该 code_id。
 -- ----------------------------------------------------------------------------
-DROP TABLE IF EXISTS code_mst;
-CREATE TABLE code_mst (
+DROP TABLE IF EXISTS t_code_mst;
+CREATE TABLE t_code_mst (
   code_type_id  VARCHAR(3)   NOT NULL                COMMENT '区分类型ID（001=吃药时间区分）',
   code_id       VARCHAR(3)   NOT NULL                COMMENT '区分ID（选项唯一ID）',
   display_order INT          NOT NULL                COMMENT '表示顺序',
@@ -86,10 +86,14 @@ CREATE TABLE code_mst (
 -- ----------------------------------------------------------------------------
 
 -- 吃药时间区分码表数据（区分类型ID=001）
-INSERT INTO code_mst (code_type_id, code_id, display_order, code_name) VALUES
+INSERT INTO t_code_mst (code_type_id, code_id, display_order, code_name) VALUES
   ('001', '001', 1, '餐前'),
   ('001', '002', 2, '随餐'),
   ('001', '003', 3, '餐后');
+
+INSERT INTO t_code_mst (code_type_id, code_id, display_order, code_name) VALUES
+  ('002', '001', 1, '是'),
+  ('002', '002', 2, '否');
 
 -- 示例用户（登录账号：admin / 123456，密码请后端加密后替换）
 INSERT INTO user_mst (user_id, user_name, login_id, password) VALUES

@@ -30,6 +30,8 @@ export interface Medicine {
   tabletsPerBox: number;
   /** 吃药时间区分（码表 001 的区分ID：001-餐前 002-随餐 003-餐后） */
   intakeTimeCode: string;
+  /** 是否继续服用（码表 002 的区分ID：001-是 002-否） */
+  intakeFlgCode: string;
   /** 每日吃药次数 */
   dailyTimes: number;
   /** 总数量（片） */
@@ -50,6 +52,7 @@ export interface MedicineSaveRequest {
   addQuantity: number;
   tabletsPerBox: number;
   intakeTimeCode: string;
+  intakeFlgCode: string;
   dailyTimes: number;
   tabletsPerTime: number;
   remark: string;
