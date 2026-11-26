@@ -3,7 +3,7 @@
   <header class="topbar">
     <div class="topbar-title">药品管理系统</div>
     <div class="topbar-user">
-      <button class="btn btn-primary" (click)="openUserPage()">用户管理</button>
+      <button *ngIf="userId === '1'" class="btn btn-primary" (click)="openUserPage()">用户管理</button>
       <span>{{ userName }} 先生/女士</span>
       <button class="btn topbar-logout" (click)="logout()">退出登录</button>
     </div>
