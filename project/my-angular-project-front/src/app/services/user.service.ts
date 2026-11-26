@@ -1,17 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
-import { map, delay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
 import {
   ApiResponse,
   UserListResult,
-  User,
-  CodeItem,
-  Medicine,
-  MedicineListResult,
-  MedicineSaveRequest
+  User
 } from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
@@ -22,16 +18,6 @@ export class UserService {
   private readonly saveUrl = `${environment.apiBaseUrl}/users/insert-user-info`;
   private readonly updateUrl = `${environment.apiBaseUrl}/users/update-user-info`;
   private readonly deleteUrl = `${environment.apiBaseUrl}/users/delete-user-record`;
-
-
-
-
-  private readonly codeUrl = `${environment.apiBaseUrl}/common/codes/intake-time`;
-  private readonly codeSearchByIdUrl = `${environment.apiBaseUrl}/common/codes/search-by-Id`;
-
-  private readonly updateMedicalRecordForPerdayUrl = `${environment.apiBaseUrl}/medicalRecord/update-medical-record-for-perday`;
-
-
 
   constructor(private http: HttpClient) {}
 
@@ -77,19 +63,11 @@ export class UserService {
     this.http.delete(url).subscribe({
       next: () => {
         console.log('删除成功');
-        // return true;
-        // // 删除成功后刷新列表
-        // this.search('');
-        // console.log('刷新列表');
       },
       error: (err) => {
         console.error('删除失败', err);
-        // return false;
       }
     });
-    // this.http.delete(url).subscribe(() => {
-    //     this.user = this.user.filter(t => t.id !== id);
-    // });
   }
   /** 删除用户 */
   remove(userId: string): Observable<boolean> {
@@ -100,38 +78,4 @@ export class UserService {
       .post<ApiResponse<boolean>>(this.deleteUrl, { ...removeUser })
       .pipe(map(res => res.data));
   }
-
-  // /** 获取吃药时间区分码表 */
-  // getIntakeTimeCodes(): Observable<CodeItem[]> {
-  //   // if (environment.useMock) {
-  //   //   return of(MockDb.intakeTimeCodes.map(c => ({ ...c }))).pipe(delay(100));
-  //   // }
-  //   // return this.http
-  //   //   .get<ApiResponse<CodeItem[]>>(this.codeUrl)
-  //   //   .pipe(map(res => res.data));
-
-  //   return this.http
-  //     .get<ApiResponse<CodeItem[]>>(this.codeSearchByIdUrl , { params: { codeTypeId:'001' } })
-  //     .pipe(map(res => res.data));
-  // }
-  // getIntakeFlgCodes(): Observable<CodeItem[]> { 
-  //   return this.http
-  //     .get<ApiResponse<CodeItem[]>>(this.codeSearchByIdUrl , { params: { codeTypeId:'002' } })
-  //     .pipe(map(res => res.data));
-  // }
-
-  // /** 根据区分ID获取区分名称 */
-  // static codeName(codes: CodeItem[], codeId: string): string {
-  //   const found = codes.find(c => c.codeId === codeId);
-  //   return found ? found.codeName : codeId;
-  // }
-
-  //   /** 更新每日服用药品数量 */
-  // updateMedicalRecordForPerday(userId: string): Observable<ApiResponse<boolean>> {
-  //   const updateMedicalRecordForPerday: any = {
-  //     userId: userId
-  //   };
-  //   return this.http
-  //     .post<ApiResponse<boolean>>(this.updateMedicalRecordForPerdayUrl, { ...updateMedicalRecordForPerday });
-  // }
 }

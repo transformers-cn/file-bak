@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
-import { map, delay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
 import {
@@ -11,7 +11,6 @@ import {
   MedicineListResult,
   MedicineSaveRequest
 } from '../models/api.models';
-// import { MockDb } from './mock-db';
 
 /**
  * 失效日期计算：生产日期 + 保质期（月）
@@ -55,14 +54,6 @@ export class MedicineService {
 
   /** 药品检索：按药品名称模糊查询 */
   search(userId: string,medicineName: string): Observable<MedicineListResult> {
-    // if (environment.useMock) {
-    //   const list = MockDb.medicines.filter(
-    //     m => !medicineName || m.medicineName.indexOf(medicineName) !== -1
-    //   );
-    //   const result: MedicineListResult = { total: list.length, list: list.map(m => ({ ...m })) };
-    //   return of(result).pipe(delay(200));
-    // }
-    
     return this.http
       .get<ApiResponse<MedicineListResult>>(this.baseUrl, { params: { userId:userId,medicineName: medicineName || '' } })
       .pipe(map(res => res.data));
@@ -70,25 +61,6 @@ export class MedicineService {
 
   /** 新增药品 */
   create(req: MedicineSaveRequest, userId: string): Observable<Medicine> {
-    // if (environment.useMock) {
-    //   const medicine: Medicine = {
-    //     userId,
-    //     medicineId: MockDb.nextMedicineId(),
-    //     medicineName: req.medicineName,
-    //     manufacturer: req.manufacturer,
-    //     productionDate: req.productionDate,
-    //     shelfLifeMonths: req.shelfLifeMonths,
-    //     expiryDate: calcExpiryDate(req.productionDate, req.shelfLifeMonths),
-    //     remainingQuantity: req.addQuantity,
-    //     tabletsPerBox: req.tabletsPerBox,
-    //     intakeTimeCode: req.intakeTimeCode,
-    //     dailyTimes: req.dailyTimes,
-    //     tabletsPerTime: req.tabletsPerTime,
-    //     remark: req.remark
-    //   };
-    //   MockDb.medicines.push(medicine);
-    //   return of({ ...medicine }).pipe(delay(200));
-    // }
 
     const medicine: Medicine = {
       userId,
@@ -115,40 +87,7 @@ export class MedicineService {
 
   /** 编辑药品（新增数量按累加处理） */
   update(medicineId: string, req: MedicineSaveRequest, userId: string): Observable<Medicine> {
-    // if (environment.useMock) {
-    //   const idx = MockDb.medicines.findIndex(m => m.medicineId === medicineId);
-    //   if (idx === -1) {
-    //     return throwError('药品不存在');
-    //   }
-    //   const old = MockDb.medicines[idx];
-    //   const updated: Medicine = {
-    //     ...old,
-    //     userId: userId,
-    //     medicineId: medicineId,
-    //     medicineName: req.medicineName,
-    //     manufacturer: req.manufacturer,
-    //     productionDate: req.productionDate,
-    //     shelfLifeMonths: req.shelfLifeMonths,
-    //     expiryDate: calcExpiryDate(req.productionDate, req.shelfLifeMonths),
-    //     remainingQuantity: old.remainingQuantity + req.addQuantity,
-    //     tabletsPerBox: req.tabletsPerBox,
-    //     intakeTimeCode: req.intakeTimeCode,
-    //     dailyTimes: req.dailyTimes,
-    //     tabletsPerTime: req.tabletsPerTime,
-    //     remark: req.remark
-    //   };
-    //   MockDb.medicines[idx] = updated;
-    //   return of({ ...updated }).pipe(delay(200));
-    // }
-    // return this.http
-    //   .put<ApiResponse<Medicine>>(`${this.baseUrl}/${medicineId}`, req)
-    //   .pipe(map(res => res.data));
-    debugger
-    // const idx = MockDb.medicines.findIndex(m => m.medicineId === medicineId);
-    // if (idx === -1) {
-    //   return throwError('药品不存在');
-    // }
-    // const old = MockDb.medicines[idx];
+    
     const updated: Medicine = {
         // ...old,
         userId: userId,
@@ -174,13 +113,7 @@ export class MedicineService {
 
   /** 删除药品 */
   remove(medicineId: string,userId: string): Observable<boolean> {
-    // if (environment.useMock) {
-    //   const idx = MockDb.medicines.findIndex(m => m.medicineId === medicineId);
-    //   if (idx !== -1) {
-    //     MockDb.medicines.splice(idx, 1);
-    //   }
-    //   return of(idx !== -1).pipe(delay(200));
-    // }
+    
     const removeMedicine: any = {
       userId: userId,
       medicineId: medicineId
@@ -192,12 +125,6 @@ export class MedicineService {
 
   /** 获取吃药时间区分码表 */
   getIntakeTimeCodes(): Observable<CodeItem[]> {
-    // if (environment.useMock) {
-    //   return of(MockDb.intakeTimeCodes.map(c => ({ ...c }))).pipe(delay(100));
-    // }
-    // return this.http
-    //   .get<ApiResponse<CodeItem[]>>(this.codeUrl)
-    //   .pipe(map(res => res.data));
 
     return this.http
       .get<ApiResponse<CodeItem[]>>(this.codeSearchByIdUrl , { params: { codeTypeId:'001' } })

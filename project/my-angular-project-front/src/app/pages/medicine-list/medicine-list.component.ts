@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { CodeItem, Medicine } from '../../models/api.models';
 import { AuthService } from '../../services/auth.service';
 import { MedicineService } from '../../services/medicine.service';
-import { Observable, of, throwError } from 'rxjs';
 @Component({
   selector: 'app-medicine-list',
   templateUrl: './medicine-list.component.html',

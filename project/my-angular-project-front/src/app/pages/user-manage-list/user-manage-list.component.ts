@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { CodeItem, Medicine, User } from '../../models/api.models';
+import {  User } from '../../models/api.models';
 import { AuthService } from '../../services/auth.service';
-import { MedicineService } from '../../services/medicine.service';
 import { UserService } from '../../services/user.service';
-import { Observable, of, throwError } from 'rxjs';
 @Component({
   selector: 'app-user-manage-list',
   templateUrl: './user-manage-list.component.html',
@@ -16,10 +14,7 @@ export class UserListComponent implements OnInit {
   userId = '';
   userName = '';
   searchKeyword = '';
-  // list: Medicine[] = [];
   userList: any;
-  // intakeTimeCodes: CodeItem[] = [];
-  // intakeFlgCodes: CodeItem[] = [];
   loading = false;
 
   errorMsg = '';
@@ -34,7 +29,6 @@ export class UserListComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private medicineService: MedicineService,
     private auth: AuthService,
     private router: Router
   ) {}
@@ -78,7 +72,7 @@ export class UserListComponent implements OnInit {
   }
 
   /** 打开编辑 POP */
-  openEdit(item: Medicine): void {
+  openEdit(item: User): void {
     this.errorMsg = '';
     this.editingUser = item;
     this.modalVisible = true;
@@ -104,7 +98,7 @@ export class UserListComponent implements OnInit {
       this.userService.deleteUser(Number(item.id));
       setTimeout(() => {
         this.search();
-      }, 1500);
+      }, 1000);
     }
   }
 

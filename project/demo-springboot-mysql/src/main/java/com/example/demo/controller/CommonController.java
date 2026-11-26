@@ -2,9 +2,7 @@ package com.example.demo.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.demo.common.Result;
-import com.example.demo.dto.LoginDTO;
 import com.example.demo.entity.CodeMst;
-import com.example.demo.entity.Medicine;
 import com.example.demo.service.CodeMstService;
 import org.springframework.web.bind.annotation.*;
 
