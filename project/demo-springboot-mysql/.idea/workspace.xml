@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="84bc1890-a7cb-430f-98a8-f356c3a8c4d9" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/demo/controller/CommonController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/demo/controller/CommonController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/demo/controller/MedicalRecordController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/demo/controller/MedicalRecordController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-angular-project-front/src/app/pages/medicine-list/medicine-list.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../my-angular-project-front/src/app/pages/medicine-list/medicine-list.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-angular-project-front/src/app/pages/user-manage-list/user-manage-list.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../my-angular-project-front/src/app/pages/user-manage-list/user-manage-list.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-angular-project-front/src/app/services/medicine.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../my-angular-project-front/src/app/services/medicine.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../my-angular-project-front/src/app/services/user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../my-angular-project-front/src/app/services/user.service.ts" afterDir="false" />
-    </list>
+    <list default="true" id="84bc1890-a7cb-430f-98a8-f356c3a8c4d9" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/classes/" />
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
