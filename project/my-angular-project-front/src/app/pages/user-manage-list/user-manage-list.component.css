@@ -2,31 +2,13 @@
   min-height: 100vh;
 }
 
-.topbar {
-  height: 56px;
-  background: #fff;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-}
-
-.topbar-title {
-  font-size: 16px;
+.page-title {
+  font-size: 18px;
   font-weight: 600;
-}
-
-.topbar-user {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--text-light);
-}
-
-.topbar-logout {
-  padding: 5px 12px;
-  font-size: 13px;
+  margin: 4px 2px 16px;
+  padding-left: 10px;
+  border-left: 4px solid var(--primary);
+  line-height: 1.2;
 }
 
 .content {

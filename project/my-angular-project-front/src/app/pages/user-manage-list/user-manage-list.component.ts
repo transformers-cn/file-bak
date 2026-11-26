@@ -102,13 +102,4 @@ export class UserListComponent implements OnInit {
     }
   }
 
-  logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/login']);
-  }
-
-  openMedicinePage(): void {
-      this.router.navigate(['/medicines']);
-      return;
-  }
 }

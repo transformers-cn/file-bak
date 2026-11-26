@@ -1,0 +1,57 @@
+<div class="shell">
+  <!-- 顶部头栏 -->
+  <header class="header">
+    <div class="header-brand">
+      <span class="brand-logo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z"/>
+          <path d="m8.5 8.5 7 7"/>
+        </svg>
+      </span>
+      药品管理系统
+    </div>
+    <div class="header-user">
+      <span class="avatar">{{ userName.charAt(0) }}</span>
+      <span>{{ userName }} 先生/女士</span>
+      <button class="header-logout" (click)="logout()">退出登录</button>
+    </div>
+  </header>
+
+  <div class="body">
+    <!-- 侧边导航栏（头栏下方） -->
+    <aside class="sidebar">
+      <div class="sidebar-title">导航菜单</div>
+      <ul class="menu">
+        <li class="menu-item" *ngIf="showUserMenu" routerLinkActive="menu-item-active">
+          <a routerLink="/user">
+            <span class="menu-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </span>
+            用户管理
+          </a>
+        </li>
+        <li class="menu-item" routerLinkActive="menu-item-active">
+          <a routerLink="/medicines">
+            <span class="menu-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.5 20.5 3.5 13.5a5 5 0 0 1 7-7l7 7a5 5 0 0 1-7 7Z"/>
+                <path d="m8.5 8.5 7 7"/>
+              </svg>
+            </span>
+            药品管理
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- 右侧内容区：各业务画面在此渲染 -->
+    <div class="shell-content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

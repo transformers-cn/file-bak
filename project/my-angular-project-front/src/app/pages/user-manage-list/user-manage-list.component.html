@@ -1,15 +1,7 @@
 <div class="page">
-  <!-- 顶部栏 -->
-  <header class="topbar">
-    <div class="topbar-title">药品管理系统(用户管理)</div>
-    <div class="topbar-user">
-      <button class="btn btn-primary" (click)="openMedicinePage()">药品管理</button>
-      <span>{{ userName }} 先生/女士</span>
-      <button class="btn topbar-logout" (click)="logout()">退出登录</button>
-    </div>
-  </header>
-
   <main class="content">
+    <h2 class="page-title">用户管理</h2>
+
     <!-- 检索区 -->
     <div class="card search-bar">
       <input class="form-control search-input" type="text" [(ngModel)]="searchKeyword"

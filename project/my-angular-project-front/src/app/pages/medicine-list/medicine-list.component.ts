@@ -105,8 +105,7 @@ export class MedicineListComponent implements OnInit {
     }
   }
 
-  /** 低库存提示列表 */
-  get lowStockList(): string[] {
+  /** 低库存提示列表 */  get lowStockList(): string[] {
     return this.list
       .filter(m => m.remainingQuantity <= this.LOW_STOCK_THRESHOLD)
       .map(m => m.medicineName);
@@ -127,11 +126,6 @@ export class MedicineListComponent implements OnInit {
     }
     const diff = new Date(expiryDate).getTime() - Date.now();
     return diff >= 0 && diff <= this.EXPIRY_WARNING_DAYS * 24 * 3600 * 1000;
-  }
-
-  logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/login']);
   }
 
   todayIntakeConfirm(list:any): void {
@@ -161,10 +155,5 @@ export class MedicineListComponent implements OnInit {
         }
       )
     }
-  }
-
-  openUserPage(): void {
-      this.router.navigate(['/user']);
-      return;
   }
 }
