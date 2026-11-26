@@ -27,7 +27,11 @@ export class LoginComponent {
       this.loading = false;
       if (result) {
         this.auth.saveSession(result);
-        this.router.navigate(['/medicines']);
+        if(this.username==='admin'){
+          this.router.navigate(['/user']);
+        }else{
+          this.router.navigate(['/medicines']);
+        }
       } else {
         this.errorMsg = '用户名或密码错误';
       }

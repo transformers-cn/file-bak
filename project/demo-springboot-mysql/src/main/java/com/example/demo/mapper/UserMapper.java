@@ -26,4 +26,6 @@ public interface UserMapper extends BaseMapper<User> {
             @Param("login_id") String loginId,
             @Param("login_password") String password
     );
+
+    String getMaxUserId();
 }

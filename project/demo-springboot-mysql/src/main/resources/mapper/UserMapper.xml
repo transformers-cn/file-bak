@@ -35,4 +35,8 @@
         AND u.login_password = #{login_password}
         ORDER BY u.id DESC
     </select>
+
+    <select id="getMaxUserId" resultType="java.lang.String">
+        select MAX(id) as maxId from t_user
+    </select>
 </mapper>

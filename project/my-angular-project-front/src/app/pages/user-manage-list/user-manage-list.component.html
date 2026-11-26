@@ -1,0 +1,67 @@
+<div class="page">
+  <!-- 顶部栏 -->
+  <header class="topbar">
+    <div class="topbar-title">药品管理系统(用户管理)</div>
+    <div class="topbar-user">
+      <button class="btn btn-primary" (click)="openMedicinePage()">药品管理</button>
+      <span>{{ userName }} 先生/女士</span>
+      <button class="btn topbar-logout" (click)="logout()">退出登录</button>
+    </div>
+  </header>
+
+  <main class="content">
+    <!-- 检索区 -->
+    <div class="card search-bar">
+      <input class="form-control search-input" type="text" [(ngModel)]="searchKeyword"
+             placeholder="请输入用户名称" (keyup.enter)="search()" />
+      <button class="btn btn-primary" (click)="search()">检索</button>
+      <button class="btn" (click)="reset()">重置</button>
+      <span class="flex-spacer"></span>
+      <button class="btn btn-primary" (click)="openCreate()">＋ 新增用户</button>
+    </div>
+
+    <!-- 欢迎语 -->
+     <p class="welcome">{{ userName }} 先生/女士，以下是您的用户信息。</p>
+    <!-- 列表区 -->
+    <div class="card table-card">
+      <table class="medicine-table">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>用户名(ID)</th>
+            <th>年龄</th>
+            <th>邮件地址</th>
+            <th>用户名（登录用）</th>
+            <th class="col-op">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of userList; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ item.name }}({{ item.id }})</td>
+            <td>{{ item.age }}</td>
+            <td>{{ item.email }}</td>
+            <td>{{ item.loginId }}</td>
+            <td class="col-op">
+              <button class="btn btn-link" (click)="openEdit(item)">编辑</button>
+              <button class="btn btn-link btn-link-danger" (click)="confirmDelete(item)">删除</button>
+            </td>
+          </tr>
+          <tr *ngIf="!loading && userList.length === 0">
+            <td colspan="13" class="empty-row">暂无数据</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="loading-row" *ngIf="loading">加载中...</div>
+      <div class="field-error-for-list-page" *ngIf="errorMsg">{{ errorMsg }}</div>
+    </div>
+  </main>
+
+  <!-- 新增/编辑 POP 弹窗 -->
+  <app-user-manage-form
+    *ngIf="modalVisible"
+    [user]="editingUser"
+    (saved)="onSaved()"
+    (closed)="closeModal()">
+  </app-user-manage-form>
+</div>

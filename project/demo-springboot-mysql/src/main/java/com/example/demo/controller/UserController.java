@@ -40,6 +40,7 @@ public class UserController {
     /** 按 id 删除：DELETE /api/users/1 */
     @DeleteMapping("/{id}")
     public Result<Boolean> remove(@PathVariable Long id) {
+
         return Result.ok(userService.removeById(id));
     }
 
@@ -59,6 +60,14 @@ public class UserController {
     @GetMapping
     public Result<List<User>> list() {
         return Result.ok(userService.list());
+    }
+
+    /** 条件查询：GET /api/searchByName */
+    @GetMapping("/searchByName")
+    public Result<List<User>> searchByName(@RequestParam(required = false) String name) {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(name != null && !name.isEmpty(), User::getName, name);
+        return Result.ok(userService.list(wrapper));
     }
 
     /** 条件查询：GET /api/users/search?name=张&age=20 */
@@ -88,5 +97,17 @@ public class UserController {
     @PostMapping("/search-post-user-info")
     public Result<List<UserDeptDTO>> searchPostUserInfo(@RequestBody User user) {
         return Result.ok(userService.listUsers(user));
+    }
+
+    /** 更新：PUT /api/users */
+    @PostMapping("/update-user-info")
+    public Result<Boolean> updateUserInfo(@RequestBody User user) {
+        return Result.ok(userService.updateUserInfo(user));
+    }
+
+    /** 新增：PUT /api/users */
+    @PostMapping("/insert-user-info")
+    public Result<Boolean> insertUserInfo(@RequestBody User user) {
+        return Result.ok(userService.insertUserInfo(user));
     }
 }

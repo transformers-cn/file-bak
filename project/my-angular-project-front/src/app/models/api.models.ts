@@ -84,3 +84,17 @@ export interface MedicineListResult {
   total: number;
   list: Medicine[];
 }
+
+export interface User {
+  id: string;
+  name: string;
+  age: number;
+  email: string;
+  loginId: string;
+  loginPassword: string;
+}
+
+export interface UserListResult {
+  total: number;
+  list: User[];
+}

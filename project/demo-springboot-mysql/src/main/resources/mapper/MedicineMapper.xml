@@ -38,6 +38,6 @@
         ORDER BY medicine_id DESC
     </select>
     <select id="getMaxMedicineId" resultType="java.lang.String">
-        select MAX(medicine_id) as maxMedicineId from t_medicine where user_id = '1'
+        select MAX(medicine_id) as maxMedicineId from t_medicine where user_id = #{userId}
     </select>
 </mapper>

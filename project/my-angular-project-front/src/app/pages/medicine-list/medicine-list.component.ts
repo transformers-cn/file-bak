@@ -163,4 +163,9 @@ export class MedicineListComponent implements OnInit {
       )
     }
   }
+
+  openUserPage(): void {
+      this.router.navigate(['/user']);
+      return;
+  }
 }
